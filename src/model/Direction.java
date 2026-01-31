@@ -6,6 +6,6 @@ public enum Direction {
 	public final int dx, dy;
 	Direction(int dx, int dy) {
 		this.dx = dx;
-		this.dy = dy;
+		this.dy =dy;
 	}
 }

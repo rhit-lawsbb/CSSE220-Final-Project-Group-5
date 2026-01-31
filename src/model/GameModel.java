@@ -17,6 +17,7 @@ public class GameModel {
 		
 		zombies = new ArrayList<>();
 		zombies.add(new Zombie(7,6,maze));
+		zombies.add(new Zombie(5,4,maze));
 		
 	}
 	

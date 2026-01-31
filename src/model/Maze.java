@@ -29,7 +29,7 @@ public class Maze {
 		for (int i = 0; i < layout.length; i++) {
 			for (int k = 0; k < layout[0].length; k++) {
 				if (layout[i][k] == 1) {
-					g.setColor(Color.DARK_GRAY);
+					g.setColor(new Color(0,125,0));
 				}else {
 					g.setColor(Color.LIGHT_GRAY);
 				}
