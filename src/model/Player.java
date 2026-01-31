@@ -23,13 +23,13 @@ public class Player extends Entity{
 			}
 	
 	public void handleKey(KeyEvent e) {
-		if (e.getKeyCode() ==KeyEvent.VK_W) {
+		if (e.getKeyCode() ==KeyEvent.VK_W || e.getKeyCode() ==KeyEvent.VK_UP) {
 			move(Direction.UP);
-		}else if (e.getKeyCode() ==KeyEvent.VK_S) {
+		}else if (e.getKeyCode() ==KeyEvent.VK_S || e.getKeyCode() ==KeyEvent.VK_DOWN) {
 			move(Direction.DOWN);
-		}else if (e.getKeyCode() ==KeyEvent.VK_A) {
+		}else if (e.getKeyCode() ==KeyEvent.VK_A || e.getKeyCode() ==KeyEvent.VK_LEFT) {
 			move(Direction.LEFT);
-		}else if (e.getKeyCode() == KeyEvent.VK_D) {
+		}else if (e.getKeyCode() == KeyEvent.VK_D || e.getKeyCode() ==KeyEvent.VK_RIGHT) {
 			move(Direction.RIGHT);
 	}
 	}
