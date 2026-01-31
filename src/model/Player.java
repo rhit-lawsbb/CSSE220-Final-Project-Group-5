@@ -16,7 +16,7 @@ public class Player extends Entity{
 		
 		try {
 			
-			sprite = ImageIO.read(Player.class.getResource("pngkit_game-character-png_106630.png"));
+			sprite = ImageIO.read(Player.class.getResource("pngkit_game-character-png_1066630.png"));
 			} catch (IOException | IllegalArgumentException ex) {
 			sprite = null; 
 			}

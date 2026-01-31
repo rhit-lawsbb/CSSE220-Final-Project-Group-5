@@ -14,7 +14,7 @@ public class Zombie extends Entity{
 	
 	public Zombie(int row, int col, Maze maze) {
 		super(row, col, maze);
-		
+		rand = new Random();
 		try {
 			sprite = ImageIO.read(Player.class.getResource("pngkey.com-gaming-characters-png-1790042.png"));
 			} catch (IOException | IllegalArgumentException ex) {
