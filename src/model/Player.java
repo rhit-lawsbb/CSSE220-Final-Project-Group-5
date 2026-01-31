@@ -1,5 +1,7 @@
 package model;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 
@@ -31,6 +33,16 @@ public class Player extends Entity{
 			move(Direction.RIGHT);
 	}
 	}
+	
+	@Override
+	 public void draw(Graphics g) {
+		 if (sprite != null) {
+			 g.drawImage(sprite, col * 48, row * 48, 48, 48, null);
+		 }else {
+			 g.setColor(Color.RED);
+			 g.fillRect(col * 48, row * 48, 48, 48);
+		 }
+	 }
 }
 
 	
