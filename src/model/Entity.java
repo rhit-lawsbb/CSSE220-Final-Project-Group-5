@@ -7,8 +7,11 @@ import java.awt.image.BufferedImage;
 public abstract class Entity {
 	 protected float x, y;
 	 protected Maze maze;
-	 protected BufferedImage sprite;
+	 protected BufferedImage spriteRight;
+	 protected BufferedImage spriteLeft;
+	 
 	 protected static final int STEP = 6;
+	 protected boolean facingRight = true;
 	 
 	 
 	 public Entity(int row, int col, Maze maze) {
@@ -32,8 +35,9 @@ public abstract class Entity {
 	 }
 	 
 	 public void draw(Graphics g) {
-		 if (sprite != null) {
-			 g.drawImage(sprite, Math.round(x), Math.round(y), 48, 48, null);
+		 BufferedImage currentSprite = facingRight ? spriteRight : spriteLeft;
+		 if (currentSprite != null) {
+			 g.drawImage(currentSprite, Math.round(x), Math.round(y), 48, 48, null);
 		 }else {
 			 g.setColor(Color.RED);
 			 g.fillRect(Math.round(x), Math.round(y), 48, 48);

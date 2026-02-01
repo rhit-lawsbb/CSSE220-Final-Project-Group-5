@@ -3,6 +3,7 @@ package model;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -18,9 +19,10 @@ public class Player extends Entity{
 		
 		try {
 			
-			sprite = ImageIO.read(Player.class.getResource("pngkit_game-character-png_1066630.png"));
+			spriteRight = ImageIO.read(Player.class.getResource("pngkit_game-character-png_1066630.png"));
+			spriteLeft = ImageIO.read(Player.class.getResource("left_character.png"));
 			} catch (IOException | IllegalArgumentException ex) {
-			sprite = null; 
+			spriteRight = spriteLeft = null; 
 			}
 			}
 	
@@ -34,8 +36,10 @@ public class Player extends Entity{
 				dy = 1;
 		}else if (e.getKeyCode() ==KeyEvent.VK_A || e.getKeyCode() ==KeyEvent.VK_LEFT) {
 			dx = -1;
+			facingRight = false;
 		}else if (e.getKeyCode() == KeyEvent.VK_D || e.getKeyCode() ==KeyEvent.VK_RIGHT) {
 			dx = 1;
+			facingRight = true;
 	}
 	}
 	
@@ -51,8 +55,10 @@ public class Player extends Entity{
 	
 	@Override
 	 public void draw(Graphics g) {
-		 if (sprite != null) {
-			 g.drawImage(sprite, Math.round(x), Math.round(y), 48, 48, null);
+		
+		BufferedImage currentSprite = facingRight ? spriteRight : spriteLeft;
+		 if (currentSprite != null) {
+			 g.drawImage(currentSprite, Math.round(x), Math.round(y), 48, 48, null);
 		 }else {
 			 g.setColor(Color.RED);
 			 g.fillRect(Math.round(x), Math.round(y), 48, 48);

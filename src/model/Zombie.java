@@ -2,6 +2,7 @@ package model;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Random;
 
@@ -20,9 +21,10 @@ public class Zombie extends Entity{
 		
 		chooseDirection();
 		try {
-			sprite = ImageIO.read(Player.class.getResource("pngkey.com-gaming-characters-png-1790042.png"));
+			spriteRight = ImageIO.read(Player.class.getResource("pngkey.com-gaming-characters-png-1790042.png"));
+			spriteLeft = ImageIO.read(Player.class.getResource("zombie_flip.png"));
 			} catch (IOException | IllegalArgumentException ex) {
-			sprite = null; 
+			spriteRight = spriteLeft = null; 
 			}
 	}
 	
@@ -63,8 +65,9 @@ public class Zombie extends Entity{
 	
 	@Override
 	 public void draw(Graphics g) {
-		 if (sprite != null) {
-			 g.drawImage(sprite, Math.round(x), Math.round(y), 48, 48, null);
+		BufferedImage currentSprite = facingRight ? spriteRight : spriteLeft;
+		 if (currentSprite != null) {
+			 g.drawImage(currentSprite, Math.round(x), Math.round(y), 48, 48, null);
 		 }else {
 			 g.setColor(Color.RED);
 			 g.fillRect(Math.round(x), Math.round(y), 48, 48);
