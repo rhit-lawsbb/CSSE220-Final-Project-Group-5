@@ -4,7 +4,7 @@ import java.awt.Graphics;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-
+//Adds every aspect into game
 public class GameModel {
 	private Maze maze;
 	private Player player;

@@ -12,7 +12,7 @@ import javax.swing.JComponent;
 import javax.swing.Timer;
 
 import model.GameModel;
-
+//Draws everything
 public class GameComponent extends JComponent implements ActionListener, KeyListener{
 
 	private Timer timer;

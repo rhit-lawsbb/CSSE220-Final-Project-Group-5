@@ -1,5 +1,5 @@
 package model;
-
+// Defines dx and dy and the rate they move
 public enum Direction {
 	UP(0,-1), DOWN(0,1), LEFT(-1,0), RIGHT(1,0);
 

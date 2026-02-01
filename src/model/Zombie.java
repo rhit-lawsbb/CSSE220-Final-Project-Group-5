@@ -27,7 +27,7 @@ public class Zombie extends Entity{
 			spriteRight = spriteLeft = null; 
 			}
 	}
-	
+	// controls direction of Zombie
 	private void chooseDirection() {
 		dx = 0;
 		dy = 0;
@@ -45,7 +45,7 @@ public class Zombie extends Entity{
 			facingRight = true;
 		}
 	}
-	
+	//checks for walls and decides to move Zombie 
 	public void wander() {
 		float nextX = x + dx * STEP;
 		float nextY = y + dy * STEP;

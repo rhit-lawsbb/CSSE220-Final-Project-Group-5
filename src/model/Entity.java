@@ -13,7 +13,7 @@ public abstract class Entity {
 	 protected static final int STEP = 6;
 	 protected boolean facingRight = true;
 	 
-	 
+	 //Base for all Zombie and Player
 	 public Entity(int row, int col, Maze maze) {
 		 this.x = col * 48;
 		 this.y = row * 48;

@@ -25,7 +25,7 @@ public class Player extends Entity{
 			spriteRight = spriteLeft = null; 
 			}
 			}
-	
+	//read keys input for movement
 	public void handleKey(KeyEvent e) {
 		
 		dx = 0;

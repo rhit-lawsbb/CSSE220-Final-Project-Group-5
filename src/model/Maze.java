@@ -100,6 +100,7 @@ public class Maze {
 				}
 			}
 		}
+		// This is the old code in case new breaks
 //	private int[][] layout = {
 //			{1,1,1,1,1,1,1,1,1,1},
 //			{1,0,0,0,0,0,1,0,0,1},
