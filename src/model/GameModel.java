@@ -1,7 +1,7 @@
 package model;
 
 import java.awt.Graphics;
-import java.awt.Graphics2D;
+
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
@@ -21,7 +21,8 @@ public class GameModel {
 		
 	}
 	
-	public void wander() {
+	public void update() {
+		player.update();
 		for (Zombie z: zombies) {
 			z.wander();
 		}

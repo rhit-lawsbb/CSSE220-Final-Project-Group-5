@@ -9,12 +9,16 @@ import javax.imageio.ImageIO;
 
 public class Zombie extends Entity{
 	private Random rand;
+	private int dx;
+	private int dy;
 	
 	
 	
 	public Zombie(int row, int col, Maze maze) {
 		super(row, col, maze);
 		rand = new Random();
+		
+		chooseDirection();
 		try {
 			sprite = ImageIO.read(Player.class.getResource("pngkey.com-gaming-characters-png-1790042.png"));
 			} catch (IOException | IllegalArgumentException ex) {
@@ -22,18 +26,48 @@ public class Zombie extends Entity{
 			}
 	}
 	
+	private void chooseDirection() {
+		dx = 0;
+		dy = 0;
+		
+		int r = rand.nextInt(4);
+		if (r == 0) {
+			dy = -1;
+		}else if (r == 1) {
+			dy = 1;
+		}else if(r == 2) {
+			dx = -1;
+		}else if (r == 3) {
+			dx = 1;
+		}
+	}
+	
 	public void wander() {
-		Direction[] d = Direction.values();
-		move(d[rand.nextInt(d.length)]);
+		float nextX = x + dx * STEP;
+		float nextY = y + dy * STEP;
+		
+		if (!canMoveTo(nextX, nextY)) {
+			chooseDirection();
+		
+			nextX = x + dx * STEP;
+			nextY = y + dy * STEP;
+			
+		}
+		
+		if (!canMoveTo(nextX, nextY)) {
+				return;
+		}
+		x = nextX;
+		y = nextY;
 	}
 	
 	@Override
 	 public void draw(Graphics g) {
 		 if (sprite != null) {
-			 g.drawImage(sprite, col * 48, row * 48, 48, 48, null);
+			 g.drawImage(sprite, Math.round(x), Math.round(y), 48, 48, null);
 		 }else {
 			 g.setColor(Color.RED);
-			 g.fillRect(col * 48, row * 48, 48, 48);
+			 g.fillRect(Math.round(x), Math.round(y), 48, 48);
 		 }
 	 }
 

@@ -14,7 +14,7 @@ import javax.swing.Timer;
 import model.GameModel;
 
 public class GameComponent extends JComponent implements ActionListener, KeyListener{
-	private static final int TILE_SIZE = 48;
+
 	private Timer timer;
 	private GameModel model;
 
@@ -25,7 +25,7 @@ public class GameComponent extends JComponent implements ActionListener, KeyList
 		
 		setFocusable(true);
 		addKeyListener(this);
-		timer = new Timer(500, this);
+		timer = new Timer(120, this);
 		timer.start();
 	}
 
@@ -62,7 +62,7 @@ public class GameComponent extends JComponent implements ActionListener, KeyList
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		model.wander();
+		model.update();
 		repaint();
 	}
 }

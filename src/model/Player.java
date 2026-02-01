@@ -10,6 +10,8 @@ import javax.imageio.ImageIO;
 
 
 public class Player extends Entity{
+	private int dx;
+	private int dy;
 
 	public Player(int row, int col, Maze maze) {
 		super(row, col, maze);
@@ -23,24 +25,37 @@ public class Player extends Entity{
 			}
 	
 	public void handleKey(KeyEvent e) {
+		
+		dx = 0;
+		dy = 0;
 		if (e.getKeyCode() ==KeyEvent.VK_W || e.getKeyCode() ==KeyEvent.VK_UP) {
-			move(Direction.UP);
+			dy = -1;
 		}else if (e.getKeyCode() ==KeyEvent.VK_S || e.getKeyCode() ==KeyEvent.VK_DOWN) {
-			move(Direction.DOWN);
+				dy = 1;
 		}else if (e.getKeyCode() ==KeyEvent.VK_A || e.getKeyCode() ==KeyEvent.VK_LEFT) {
-			move(Direction.LEFT);
+			dx = -1;
 		}else if (e.getKeyCode() == KeyEvent.VK_D || e.getKeyCode() ==KeyEvent.VK_RIGHT) {
-			move(Direction.RIGHT);
+			dx = 1;
 	}
+	}
+	
+	public void update() {
+		float nextX = x + dx * STEP;
+		float nextY = y + dy * STEP;
+		
+		if (canMoveTo(nextX, nextY)) {
+			x = nextX;
+			y = nextY;
+		}
 	}
 	
 	@Override
 	 public void draw(Graphics g) {
 		 if (sprite != null) {
-			 g.drawImage(sprite, col * 48, row * 48, 48, 48, null);
+			 g.drawImage(sprite, Math.round(x), Math.round(y), 48, 48, null);
 		 }else {
 			 g.setColor(Color.RED);
-			 g.fillRect(col * 48, row * 48, 48, 48);
+			 g.fillRect(Math.round(x), Math.round(y), 48, 48);
 		 }
 	 }
 }
