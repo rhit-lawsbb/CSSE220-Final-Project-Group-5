@@ -21,8 +21,8 @@ public class Zombie extends Entity{
 		
 		chooseDirection();
 		try {
-			spriteRight = ImageIO.read(Player.class.getResource("pngkey.com-gaming-characters-png-1790042.png"));
-			spriteLeft = ImageIO.read(Player.class.getResource("zombie_flip.png"));
+			spriteRight = ImageIO.read(Player.class.getResource("zombie_flip.png"));
+			spriteLeft = ImageIO.read(Player.class.getResource("pngkey.com-gaming-characters-png-1790042.png"));
 			} catch (IOException | IllegalArgumentException ex) {
 			spriteRight = spriteLeft = null; 
 			}
@@ -39,8 +39,10 @@ public class Zombie extends Entity{
 			dy = 1;
 		}else if(r == 2) {
 			dx = -1;
+			facingRight = false;
 		}else if (r == 3) {
 			dx = 1;
+			facingRight = true;
 		}
 	}
 	
