@@ -38,7 +38,7 @@ public class Maze {
 				{1,0,0,0,0,1,0,0,0,1},
 				{1,0,1,1,0,0,0,1,0,1},
 				{1,0,0,1,1,1,0,1,0,1},
-				{1,1,0,0,0,1,1,1,0,1},
+				{1,0,0,0,0,1,1,1,0,1},
 				{1,1,1,1,1,1,1,1,1,1}
 			},
 			//Layout 3
@@ -92,8 +92,8 @@ public class Maze {
 			
 			try {
 				floorImage = ImageIO.read(getClass().getResource("Pirate_Ship_Deck.png"));
-				cornerImage = ImageIO.read(getClass().getResource("Ship_Corner_right.png"));
-				sideImage = ImageIO.read(getClass().getResource("Ship_side1.png"));
+				cornerImage = ImageIO.read(getClass().getResource("Wood_corner2.png"));
+				sideImage = ImageIO.read(getClass().getResource("Ship_wall1.png"));
 			} catch (IOException | IllegalArgumentException e) {
 				floorImage = null; // Fallback to original color if missing
 			}
