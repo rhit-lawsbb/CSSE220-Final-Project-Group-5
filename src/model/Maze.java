@@ -2,10 +2,18 @@ package model;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.Random;
+import javax.imageio.ImageIO;
 
 public class Maze {
-	
+	 private BufferedImage floorImage;
+	 private BufferedImage cornerImage;
+	 private BufferedImage sideImage;
+	 
 	private int[][][] layouts = {
 			//Layout 1
 			{
@@ -81,6 +89,14 @@ public class Maze {
 			Random rand = new Random();
 			int index = rand.nextInt(layouts.length);
 			this.currentLayout = layouts[index];
+			
+			try {
+				floorImage = ImageIO.read(getClass().getResource("Pirate_Ship_Deck.png"));
+				cornerImage = ImageIO.read(getClass().getResource("Ship_Corner_right.png"));
+				sideImage = ImageIO.read(getClass().getResource("Ship_side1.png"));
+			} catch (IOException | IllegalArgumentException e) {
+				floorImage = null; // Fallback to original color if missing
+			}
 		}
 		
 		public boolean isWall(int row, int col) {
@@ -89,17 +105,68 @@ public class Maze {
 		}
 		
 		public void draw(Graphics g) {
-			for (int i = 0; i < currentLayout.length; i++) {
-				for (int k = 0; k < currentLayout[0].length; k++) {
-					if (currentLayout[i][k] == 1) {
-						g.setColor(new Color(0,125,0));
-					} else {
-						g.setColor(Color.LIGHT_GRAY);
+			Graphics2D g2d = (Graphics2D) g;
+			int size = currentLayout.length;
+
+			for (int r = 0; r < size; r++) {
+				for (int c = 0; c < size; c++) {
+					int x = c * 48;
+					int y = r * 48;
+
+					if (floorImage != null) g2d.drawImage(floorImage, x, y, 48, 48, null);
+
+					if (isWall(r, c)) {
+						// 1. PERMANENT OUTER FRAME LOGIC
+						if (r == 0 && c == 0) drawRotated(g2d, cornerImage, x, y, 0); 
+						else if (r == 0 && c == size - 1) drawRotated(g2d, cornerImage, x, y, 90);
+						else if (r == size - 1 && c == size - 1) drawRotated(g2d, cornerImage, x, y, 180);
+						else if (r == size - 1 && c == 0) drawRotated(g2d, cornerImage, x, y, 270);
+						else if (r == 0) drawRotated(g2d, sideImage, x, y, 0); // Top wall
+						else if (c == size - 1) drawRotated(g2d, sideImage, x, y, 90); // Right wall
+						else if (r == size - 1) drawRotated(g2d, sideImage, x, y, 180); // Bottom wall
+						else if (c == 0) drawRotated(g2d, sideImage, x, y, 270); // Left wall
+						
+						// 2. INTERNAL DYNAMIC LOGIC
+						else {
+							drawInternalWall(g2d, r, c, x, y);
+						}
 					}
-					g.fillRect(k * 48, i * 48, 48, 48);
 				}
 			}
 		}
+
+		private void drawInternalWall(Graphics2D g2d, int r, int c, int x, int y) {
+			boolean up = isWall(r - 1, c);
+			boolean down = isWall(r + 1, c);
+			boolean left = isWall(r, c - 1);
+			boolean right = isWall(r, c + 1);
+
+			// Internal Corner logic
+			if (right && down && !up && !left) drawRotated(g2d, cornerImage, x, y, 0);
+			else if (left && down && !up && !right) drawRotated(g2d, cornerImage, x, y, 90);
+			else if (left && up && !down && !right) drawRotated(g2d, cornerImage, x, y, 180);
+			else if (right && up && !down && !left) drawRotated(g2d, cornerImage, x, y, 270);
+			// Internal Straight logic
+			else if (left || right) drawRotated(g2d, sideImage, x, y, 0);
+			else if (up || down) drawRotated(g2d, sideImage, x, y, 90);
+			else {
+				g2d.setColor(new Color(0, 125, 0));
+				g2d.fillRect(x, y, 48, 48);
+			}
+		}
+
+		private void drawRotated(Graphics2D g2d, BufferedImage img, int x, int y, double angle) {
+			if (img == null) return;
+			AffineTransform old = g2d.getTransform();
+			g2d.rotate(Math.toRadians(angle), x + 24, y + 24);
+			g2d.drawImage(img, x, y, 48, 48, null);
+			g2d.setTransform(old);
+		}
+	}
+
+
+
+
 		// This is the old code in case new breaks
 //	private int[][] layout = {
 //			{1,1,1,1,1,1,1,1,1,1},
@@ -133,4 +200,4 @@ public class Maze {
 //			}
 //		}
 //	}
-}
+
