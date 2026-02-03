@@ -27,20 +27,20 @@ public class Player extends Entity{
 			}
 	//read keys input for movement
 	public void handleKey(KeyEvent e) {
-		
-		dx = 0;
-		dy = 0;
-		if (e.getKeyCode() ==KeyEvent.VK_W || e.getKeyCode() ==KeyEvent.VK_UP) {
-			dy = -1;
-		}else if (e.getKeyCode() ==KeyEvent.VK_S || e.getKeyCode() ==KeyEvent.VK_DOWN) {
-				dy = 1;
-		}else if (e.getKeyCode() ==KeyEvent.VK_A || e.getKeyCode() ==KeyEvent.VK_LEFT) {
-			dx = -1;
-			facingRight = false;
-		}else if (e.getKeyCode() == KeyEvent.VK_D || e.getKeyCode() ==KeyEvent.VK_RIGHT) {
-			dx = 1;
-			facingRight = true;
-	}
+		int key = e.getKeyCode();
+
+	    // Only update movement if one of the WASD/Arrow keys is pressed
+	    if (key == KeyEvent.VK_W || key == KeyEvent.VK_UP) {
+	        dx = 0; dy = -1;
+	    } else if (key == KeyEvent.VK_S || key == KeyEvent.VK_DOWN) {
+	        dx = 0; dy = 1;
+	    } else if (key == KeyEvent.VK_A || key == KeyEvent.VK_LEFT) {
+	        dx = -1; dy = 0;
+	        facingRight = false;
+	    } else if (key == KeyEvent.VK_D || key == KeyEvent.VK_RIGHT) {
+	        dx = 1; dy = 0;
+	        facingRight = true;
+	    }
 	}
 	
 	public void update() {
