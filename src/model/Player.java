@@ -8,13 +8,16 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+// the player character, handles movement, lives, and sprite changes
 public class Player extends Entity{
 	private int dx;
 	private int dy;
 	private int lives;
+	// stores different sized sprites for each life stage
 	private BufferedImage[] rightSprites;
 	private BufferedImage[] leftSprites;
 
+	// loads all 3 sprite sizes (player shrinks as they lose lives)
 	public Player(int row, int col, Maze maze) {
 		super(row, col, maze);
 		lives = 3;
@@ -35,6 +38,7 @@ public class Player extends Entity{
 		updateSprite();
 	}
 
+	// sets movement direction based on wasd or arrow keys
 	public void handleKey(KeyEvent e) {
 		int key = e.getKeyCode();
 
@@ -51,6 +55,7 @@ public class Player extends Entity{
 	    }
 	}
 
+	// moves the player if the next position isn't blocked
 	public void update() {
 		float nextX = x + dx * STEP;
 		float nextY = y + dy * STEP;
@@ -61,6 +66,7 @@ public class Player extends Entity{
 		}
 	}
 
+	// removes a life and updates the sprite to look smaller
 	public void loseLife() {
 		if (lives > 0) {
 			lives--;
@@ -68,6 +74,7 @@ public class Player extends Entity{
 		}
 	}
 
+	// adds a life back, max 3
 	public void gainLife() {
 		if (lives < 3) {
 			lives++;
@@ -75,6 +82,7 @@ public class Player extends Entity{
 		}
 	}
 
+	// swaps to the correct sprite based on current lives
 	private void updateSprite() {
 		int index = 3 - lives;
 		if (index < 0) index = 0;

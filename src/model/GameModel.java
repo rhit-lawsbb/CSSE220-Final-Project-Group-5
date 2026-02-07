@@ -7,6 +7,7 @@ import java.util.Random;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
+// main game class
 public class GameModel {
 	private Maze maze;
 	private Player player;
@@ -21,6 +22,7 @@ public class GameModel {
 	private int heartsSpawnedCount = 0;
 	private static final int MAX_HEARTS = 4;
 
+	// sets up the maze, player, enemies, and collectibles
 	public GameModel() {
 		maze = new Maze();
 		player = new Player(1, 1, maze);
@@ -36,6 +38,7 @@ public class GameModel {
 		collisionHandler = new CollisionHandler(player, zombies, items);
 	}
 
+	// places zombies at random valid spots, away from the player
 	private void spawnZombies(int count) {
 		for (int i = 0; i < count; i++) {
 			boolean valid = false;
@@ -55,6 +58,7 @@ public class GameModel {
 		}
 	}
 
+	// places coins at random empty spots
 	private void spawnCoins(int count) {
 		for (int i = 0; i < count; i++) {
 			boolean valid = false;
@@ -73,6 +77,7 @@ public class GameModel {
 		}
 	}
 
+	// spawns a heart pickup, stops after max limit is reached
 	private void spawnNewHeart() {
 		if (heartsSpawnedCount >= MAX_HEARTS) {
 			heart = null;
@@ -97,6 +102,7 @@ public class GameModel {
 		}
 	}
 
+	// picks up heart on contact and starts a timer to spawn the next one
 	private void tryPickUpHeart() {
 		if (heart == null || !heart.isActive() || isHeartRespawning) return;
 		if (!collisionHandler.checkHeartCollision(heart)) return;
@@ -110,6 +116,7 @@ public class GameModel {
 		respawnTimer.start();
 	}
 
+	// moves entities, checks collisions, checks game over
 	public void update() {
 		if (gameOver) return;
 
@@ -126,6 +133,7 @@ public class GameModel {
 		}
 	}
 
+	// passes key input to player
 	public void handleKey(KeyEvent e) {
 		if (gameOver) {
 			if (e.getKeyCode() == KeyEvent.VK_R) {
@@ -137,6 +145,7 @@ public class GameModel {
 		player.handleKey(e);
 	}
 
+	// resets everything back to a fresh game
 	private void restart() {
 		maze = new Maze();
 		player = new Player(1, 1, maze);
@@ -153,6 +162,7 @@ public class GameModel {
 		collisionHandler = new CollisionHandler(player, zombies, items);
 	}
 
+	// draws everything, plus a game over screen if the player died
 	public void draw(Graphics g) {
 		maze.draw(g);
 

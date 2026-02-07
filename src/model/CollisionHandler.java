@@ -2,6 +2,7 @@ package model;
 
 import java.util.ArrayList;
 
+// handles all collision detection between the player and other objects
 public class CollisionHandler {
 	private Player player;
 	private ArrayList<Zombie> zombies;
@@ -17,15 +18,18 @@ public class CollisionHandler {
 		this.hitCooldown = 0;
 	}
 
+	// runs all collision checks each frame
 	public void checkCollisions() {
 		checkCoinCollisions();
 		checkZombieCollisions();
 	}
 
+	// checks if two objects are close enough to be touching
 	private boolean overlaps(float x1, float y1, float x2, float y2) {
 		return Math.abs(x1 - x2) < 36 && Math.abs(y1 - y2) < 36;
 	}
 
+	// picks up coins the player is touching and adds to score
 	private void checkCoinCollisions() {
 		ArrayList<Collectables> collected = new ArrayList<>();
 		for (Collectables coin : items) {
@@ -37,6 +41,7 @@ public class CollisionHandler {
 		items.removeAll(collected);
 	}
 
+	// damages player if a zombie is touching them, with cooldown between hits
 	private void checkZombieCollisions() {
 		if (hitCooldown > 0) {
 			hitCooldown--;
@@ -51,6 +56,7 @@ public class CollisionHandler {
 		}
 	}
 
+	// gives the player a life if they walk over a heart
 	public boolean checkHeartCollision(Heart heart) {
 		if (heart == null || !heart.isActive()) return false;
 		if (overlaps(player.getX(), player.getY(), heart.getX(), heart.getY())) {

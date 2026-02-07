@@ -6,6 +6,7 @@ import java.awt.Graphics;
 
 import model.GameModel;
 
+// draws the top bar showing lives and score
 public class HUD {
 	private GameModel model;
 
@@ -13,6 +14,7 @@ public class HUD {
 		this.model = model;
 	}
 
+	// renders a dark bar with heart icons on the left and score on the right
 	public void draw(Graphics g) {
 		g.setColor(new Color(0, 0, 0, 150));
 		g.fillRect(0, 0, 480, 30);
