@@ -34,6 +34,9 @@ public abstract class Entity {
 		 return true;
 	 }
 	 
+	 public float getX() { return x; }
+	 public float getY() { return y; }
+
 	 public void draw(Graphics g) {
 		 BufferedImage currentSprite = facingRight ? spriteRight : spriteLeft;
 		 if (currentSprite != null) {

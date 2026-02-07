@@ -17,11 +17,13 @@ public class GameComponent extends JComponent implements ActionListener, KeyList
 
 	private Timer timer;
 	private GameModel model;
+	private HUD hud;
 
 
 	public GameComponent(GameModel model) {
 		setPreferredSize(new Dimension(480, 480));
 		this.model = model;
+		this.hud = new HUD(model);
 		
 		setFocusable(true);
 		addKeyListener(this);
@@ -37,6 +39,7 @@ public class GameComponent extends JComponent implements ActionListener, KeyList
 
 	if (model != null) {
 		model.draw(g);
+		hud.draw(g);
 	}else {
 	// Minimal placeholder to test  it’s running
 	g2.drawString("Final Project Starter: UI is running ✅", 20, 30);

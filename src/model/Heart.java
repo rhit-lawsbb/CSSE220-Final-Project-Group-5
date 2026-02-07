@@ -36,6 +36,8 @@ public class Heart {
 		    g.drawImage(currentSprite, x, y, 48, 48, null);
 		}
 	
+	public int getX() { return x; }
+	public int getY() { return y; }
 	public boolean isActive() { return active; }
 	public void setActive(boolean active) { this.active = active; }
 
