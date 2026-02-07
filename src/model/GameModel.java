@@ -97,12 +97,10 @@ public class GameModel {
 		}
 	}
 
-	public void tryPickUpHeart() {
+	private void tryPickUpHeart() {
 		if (heart == null || !heart.isActive() || isHeartRespawning) return;
-		if (!collisionHandler.isPlayerNearHeart(heart)) return;
+		if (!collisionHandler.checkHeartCollision(heart)) return;
 
-		player.gainLife();
-		heart.setActive(false);
 		isHeartRespawning = true;
 
 		javax.swing.Timer respawnTimer = new javax.swing.Timer(5000, e -> {
@@ -121,6 +119,7 @@ public class GameModel {
 		}
 
 		collisionHandler.checkCollisions();
+		tryPickUpHeart();
 
 		if (!player.isAlive()) {
 			gameOver = true;
@@ -128,12 +127,30 @@ public class GameModel {
 	}
 
 	public void handleKey(KeyEvent e) {
-		if (gameOver) return;
+		if (gameOver) {
+			if (e.getKeyCode() == KeyEvent.VK_R) {
+				restart();
+			}
+			return;
+		}
 
 		player.handleKey(e);
-		if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-			tryPickUpHeart();
-		}
+	}
+
+	private void restart() {
+		maze = new Maze();
+		player = new Player(1, 1, maze);
+		zombies = new ArrayList<>();
+		items = new ArrayList<>();
+		gameOver = false;
+		isHeartRespawning = false;
+		heartsSpawnedCount = 0;
+
+		spawnZombies(2);
+		spawnCoins(3);
+		spawnNewHeart();
+
+		collisionHandler = new CollisionHandler(player, zombies, items);
 	}
 
 	public void draw(Graphics g) {
@@ -162,6 +179,8 @@ public class GameModel {
 			g.setColor(Color.WHITE);
 			g.setFont(new Font("Arial", Font.PLAIN, 20));
 			g.drawString("Score: " + collisionHandler.getScore(), 185, 280);
+			g.setFont(new Font("Arial", Font.PLAIN, 16));
+			g.drawString("Press R to Restart", 175, 320);
 		}
 	}
 

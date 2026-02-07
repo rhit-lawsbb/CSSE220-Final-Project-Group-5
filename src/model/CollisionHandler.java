@@ -51,9 +51,14 @@ public class CollisionHandler {
 		}
 	}
 
-	public boolean isPlayerNearHeart(Heart heart) {
+	public boolean checkHeartCollision(Heart heart) {
 		if (heart == null || !heart.isActive()) return false;
-		return overlaps(player.getX(), player.getY(), heart.getX(), heart.getY());
+		if (overlaps(player.getX(), player.getY(), heart.getX(), heart.getY())) {
+			player.gainLife();
+			heart.setActive(false);
+			return true;
+		}
+		return false;
 	}
 
 	public int getScore() { return score; }
