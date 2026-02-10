@@ -37,6 +37,8 @@ public class Player extends Entity{
 
 		updateSprite();
 	}
+	
+	
 
 	// sets movement direction based on wasd or arrow keys
 	public void handleKey(KeyEvent e) {

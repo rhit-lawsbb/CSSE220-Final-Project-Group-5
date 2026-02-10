@@ -20,11 +20,14 @@ public abstract class Entity {
 		 this.maze = maze;
 	 }
 	 
+	 
 	 protected boolean canMoveTo(float newX, float newY) {
-		 int leftTile = (int) (newX/ 48);
-		 int rightTile = (int) ((newX + 48 -1) / 48);
-		 int topTile = (int) (newY / 48);
-		 int bottomTile = (int) ((newY + 48 -1) / 48);
+		 
+		 
+		 int leftTile = (int) (newX / 46);
+		 int rightTile = (int) ((newX + 48 -3) / 48);
+		 int topTile = (int) (newY / 46);
+		 int bottomTile = (int) ((newY + 48 -3) / 48);
 		 
 		 if (maze.isWall(topTile, leftTile)) return false;
 		 if (maze.isWall(topTile, rightTile)) return false;

@@ -27,6 +27,10 @@ public class Zombie extends Entity{
 			spriteRight = spriteLeft = null; 
 			}
 	}
+	
+	
+	
+	
 	// controls direction of Zombie
 	private void chooseDirection() {
 		dx = 0;
