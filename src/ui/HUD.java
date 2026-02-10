@@ -3,32 +3,49 @@ package ui;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 import model.GameModel;
 
-// draws the top bar showing lives and score
 public class HUD {
-	private GameModel model;
+    private GameModel model;
+    private BufferedImage sprite1;
+    private BufferedImage sprite2;
+    private static final int FLIP_SPEED_MS = 1500;
 
-	public HUD(GameModel model) {
-		this.model = model;
-	}
+    public HUD(GameModel model) {
+        this.model = model;
+        
+        try {
+            // Load the same sprites used in the Heart class
+            this.sprite1 = ImageIO.read(getClass().getResource("Health_region.png"));
+            this.sprite2 = ImageIO.read(getClass().getResource("flipped_Health_region.png"));
+        } catch (IOException | IllegalArgumentException e) {
+            System.err.println("HUD Heart image error: " + e.getMessage());
+        }
+    }
 
-	// renders a dark bar with heart icons on the left and score on the right
-	public void draw(Graphics g) {
-		g.setColor(new Color(0, 0, 0, 150));
-		g.fillRect(0, 0, 480, 30);
+    public void draw(Graphics g) {
+        // 1. Draw the background bar
+    	 g.setColor(new Color(0, 0, 0, 150));
+    	    g.fillRect(0, 0, 480, 45); 
 
-		g.setFont(new Font("Arial", Font.BOLD, 16));
+    	    if (sprite1 != null && sprite2 != null) {
+    	        boolean showFirst = (System.currentTimeMillis() / FLIP_SPEED_MS) % 2 == 0;
+    	        BufferedImage currentSprite = showFirst ? sprite1 : sprite2;
 
-		g.setColor(Color.RED);
-		String livesText = "";
-		for (int i = 0; i < model.getLives(); i++) {
-			livesText += "\u2764 ";
-		}
-		g.drawString(livesText, 10, 21);
+    	        for (int i = 0; i < model.getLives(); i++) {
+    	            // Increased size to 40x40 (Width, Height)
+    	            // Increased spacing to 45 (i * 45) to prevent overlap
+    	            g.drawImage(currentSprite, 10 + (i * 45), 7, 40, 40, null);
+    	        }
+    	    }
 
-		g.setColor(Color.YELLOW);
-		g.drawString("Score: " + model.getScore(), 380, 21);
-	}
+    	    // 2. Adjusted Score position to match the new bar height
+    	    g.setFont(new Font("Arial", Font.BOLD, 16));
+    	    g.setColor(Color.YELLOW);
+    	    g.drawString("Score: " + model.getScore(), 380, 35);
+    	}
 }
