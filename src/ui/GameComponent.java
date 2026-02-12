@@ -38,8 +38,10 @@ public class GameComponent extends JComponent implements ActionListener, KeyList
 	Graphics2D g2 = (Graphics2D) g;
 
 	if (model != null) {
-		model.draw(g);
-		hud.draw(g);
+		model.draw(g, this);
+		if (!model.isPlayingDeathVideo()) {
+			hud.draw(g);
+		}
 	}else {
 	// Minimal placeholder to test  it’s running
 	g2.drawString("Final Project Starter: UI is running ✅", 20, 30);

@@ -3,6 +3,8 @@ package model;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.ImageObserver;
 import java.util.Random;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ public class GameModel {
 	private Heart heart;
 	private CollisionHandler collisionHandler;
 	private boolean gameOver;
+	private boolean playingDeathVideo = false;
 
 	private Random rand = new Random();
 	private boolean isHeartRespawning = false;
@@ -118,7 +121,7 @@ public class GameModel {
 
 	// moves entities, checks collisions, checks game over
 	public void update() {
-		if (gameOver) return;
+		if (gameOver || playingDeathVideo) return;
 
 		player.update();
 		for (Zombie z : zombies) {
@@ -129,7 +132,11 @@ public class GameModel {
 		tryPickUpHeart();
 
 		if (!player.isAlive()) {
-			gameOver = true;
+			playingDeathVideo = true;
+			DeathVideoPlayer.playVideo(() -> {
+				playingDeathVideo = false;
+				gameOver = true;
+			});
 		}
 	}
 
@@ -152,6 +159,7 @@ public class GameModel {
 		zombies = new ArrayList<>();
 		items = new ArrayList<>();
 		gameOver = false;
+		playingDeathVideo = false;
 		isHeartRespawning = false;
 		heartsSpawnedCount = 0;
 
@@ -163,7 +171,17 @@ public class GameModel {
 	}
 
 	// draws everything, plus a game over screen if the player died
-	public void draw(Graphics g) {
+	public void draw(Graphics g, ImageObserver observer) {
+		if (playingDeathVideo) {
+			g.setColor(Color.BLACK);
+			g.fillRect(0, 0, 480, 480);
+			Image frame = DeathVideoPlayer.getVideoImage();
+			if (frame != null) {
+				g.drawImage(frame, 0, 0, 480, 480, observer);
+			}
+			return;
+		}
+
 		maze.draw(g);
 
 		for (Collectables item : items) {
@@ -199,4 +217,6 @@ public class GameModel {
 	public int getLives() { return player.getLives(); }
 
 	public boolean isGameOver() { return gameOver; }
+
+	public boolean isPlayingDeathVideo() { return playingDeathVideo; }
 }
