@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -16,6 +17,9 @@ public class Player extends Entity{
 	// stores different sized sprites for each life stage
 	private BufferedImage[] rightSprites;
 	private BufferedImage[] leftSprites;
+	
+	private boolean hasGun = false;
+	private List<Bullet> bullets = new java.util.ArrayList<>();
 
 	// loads all 3 sprite sizes (player shrinks as they lose lives)
 	public Player(int row, int col, Maze maze) {
@@ -106,5 +110,45 @@ public class Player extends Entity{
 			 g.setColor(Color.RED);
 			 g.fillRect(Math.round(x), Math.round(y), 48, 48);
 		 }
+		 
+		 for (Bullet b : bullets) {
+		        b.draw(g);
+		    }
 	 }
+	
+	public boolean hasGun() {
+		return hasGun; 
+		}
+	
+	public void pickupGun() { 
+		hasGun = true; 
+		}
+	
+	public void shoot() {
+	    if (!hasGun) return;
+	    bullets.add(new Bullet(x, y, facingRight, maze));
+	}
+	
+	public void updateBullets(List<Zombie> zombies, java.util.List<Collectables> coins) {
+	    for (int i = 0; i < bullets.size(); i++) {
+	        Bullet b = bullets.get(i);
+	        b.update();
+	        // Check if bullet hit zombie
+	        for (int j = 0; j < zombies.size(); j++) {
+	            Zombie z = zombies.get(j);
+	            if (Math.abs(b.getX() - z.getX()) < 30 && Math.abs(b.getY() - z.getY()) < 30) {
+	                // remove zombie and replace with coin
+	                zombies.remove(j);
+	                coins.add(new Collectables((int)(z.getX() / 48), (int)(z.getY() / 48)));
+	                b.deactivate();
+	                break;
+	            }
+	        }
+	        // remove inactive
+	        if (!b.isActive()) {
+	            bullets.remove(i);
+	            i--;
+	        }
+	    }
+	}
 }

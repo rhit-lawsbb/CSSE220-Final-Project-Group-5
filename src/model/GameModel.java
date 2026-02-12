@@ -16,6 +16,7 @@ public class GameModel {
 	private Heart heart;
 	private CollisionHandler collisionHandler;
 	private boolean gameOver;
+	private Gun gun;
 
 	private Random rand = new Random();
 	private boolean isHeartRespawning = false;
@@ -26,6 +27,7 @@ public class GameModel {
 	public GameModel() {
 		maze = new Maze();
 		player = new Player(1, 1, maze);
+		gun = new Gun(1,2);
 
 		zombies = new ArrayList<>();
 		items = new ArrayList<>();
@@ -121,9 +123,16 @@ public class GameModel {
 		if (gameOver) return;
 
 		player.update();
+		
+		if (gun != null && gun.isActive() && gun.collidesWith(player)) {
+		    player.pickupGun();
+		    gun.setActive(false);
+		}
+		player.updateBullets(zombies, items);
 		for (Zombie z : zombies) {
 			z.wander();
 		}
+		
 
 		collisionHandler.checkCollisions();
 		tryPickUpHeart();
@@ -135,6 +144,9 @@ public class GameModel {
 
 	// passes key input to player
 	public void handleKey(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_F) {
+		    player.shoot();
+		}
 		if (gameOver) {
 			if (e.getKeyCode() == KeyEvent.VK_R) {
 				restart();
@@ -144,6 +156,8 @@ public class GameModel {
 
 		player.handleKey(e);
 	}
+	
+
 
 	// resets everything back to a fresh game
 	private void restart() {
@@ -173,12 +187,16 @@ public class GameModel {
 		if (heart != null && heart.isActive()) {
 			heart.draw(g);
 		}
+		
+		gun.draw(g);
 
 		player.draw(g);
 
 		for (Zombie z : zombies) {
 			z.draw(g);
 		}
+		
+		
 
 		if (gameOver) {
 			g.setColor(new Color(0, 0, 0, 150));
