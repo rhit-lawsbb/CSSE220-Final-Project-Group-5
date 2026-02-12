@@ -27,7 +27,7 @@ public class GameModel {
 	public GameModel() {
 		maze = new Maze();
 		player = new Player(1, 1, maze);
-		gun = new Gun(1,2);
+		gun = new Gun(8,8);
 
 		zombies = new ArrayList<>();
 		items = new ArrayList<>();

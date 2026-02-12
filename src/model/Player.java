@@ -18,6 +18,7 @@ public class Player extends Entity{
 	private BufferedImage[] rightSprites;
 	private BufferedImage[] leftSprites;
 	
+	
 	private boolean hasGun = false;
 	private List<Bullet> bullets = new java.util.ArrayList<>();
 
