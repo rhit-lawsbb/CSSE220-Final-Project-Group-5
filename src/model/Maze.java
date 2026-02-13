@@ -14,11 +14,13 @@ public class Maze {
 	 private BufferedImage cornerImage;
 	 private BufferedImage sideImage;
 	 
+	 private BufferedImage exitImage;
+	 
 	private int[][][] layouts = {
 			//Layout 1
 			{
 				{1,1,1,1,1,1,1,1,1,1},
-				{1,0,0,0,0,0,1,0,0,1},
+				{1,0,0,0,0,0,1,0,0,2},
 				{1,0,1,1,1,0,1,0,1,1},
 				{1,0,0,0,1,0,0,0,0,1},
 				{1,1,1,0,1,1,1,1,0,1},
@@ -39,7 +41,7 @@ public class Maze {
 				{1,0,1,1,0,0,0,1,0,1},
 				{1,0,0,1,1,1,0,1,0,1},
 				{1,0,0,0,0,1,1,1,0,1},
-				{1,1,1,1,1,1,1,1,1,1}
+				{1,1,1,1,2,1,1,1,1,1}
 			},
 			//Layout 3
 			{
@@ -51,7 +53,7 @@ public class Maze {
 				{1,0,1,0,0,0,0,1,1,1},
 				{1,0,0,0,1,0,1,1,0,1},
 				{1,1,0,1,1,0,0,1,0,1},
-				{1,0,0,0,1,1,0,0,0,1},
+				{2,0,0,0,1,1,0,0,0,1},
 				{1,1,1,1,1,1,1,1,1,1}
 			},
 			//Layout 4
@@ -61,7 +63,7 @@ public class Maze {
 				{1,1,1,1,1,0,1,1,0,1},
 				{1,0,1,0,0,0,1,0,0,1},
 				{1,0,1,0,1,1,1,0,1,1},
-				{1,0,0,0,0,0,1,0,0,1},
+				{1,0,0,0,0,0,1,0,0,2},
 				{1,0,1,1,1,0,1,1,1,1},
 				{1,0,1,0,1,0,0,1,0,1},
 				{1,0,0,0,1,1,0,0,0,1},
@@ -78,7 +80,7 @@ public class Maze {
 				{1,0,1,1,0,1,1,1,0,1},
 				{1,0,1,1,0,0,0,0,0,1},
 				{1,0,0,1,1,1,1,1,0,1},
-				{1,1,1,1,1,1,1,1,1,1}
+				{1,1,1,1,1,1,1,1,2,1}
 			}
 		};
 		
@@ -94,14 +96,29 @@ public class Maze {
 				floorImage = ImageIO.read(getClass().getResource("Pirate_Ship_Deck.png"));
 				cornerImage = ImageIO.read(getClass().getResource("Wood_corner2.png"));
 				sideImage = ImageIO.read(getClass().getResource("Ship_wall1.png"));
+				
+				BufferedImage doorBase = ImageIO.read(getClass().getResource("Plank_water.png"));
+				BufferedImage doorTop = ImageIO.read(getClass().getResource("Plank.png"));
+				exitImage = new BufferedImage(48, 48, BufferedImage.TYPE_INT_ARGB);
+				Graphics2D gExit = exitImage.createGraphics();
+				gExit.drawImage(doorBase, 0, 0, 48, 48, null);
+				gExit.drawImage(doorTop, 0, 0, 48, 48, null);
+				gExit.dispose();
+				
 			} catch (IOException | IllegalArgumentException e) {
 				floorImage = null; // Fallback to original color if missing
+				exitImage = null;
 			}
 		}
 		
 		public boolean isWall(int row, int col) {
 			if (row < 0 || col < 0 || row >= currentLayout.length || col >= currentLayout[0].length) return true;
 			return currentLayout[row][col] == 1;
+		}
+		
+		public boolean isExit(int row, int col) {
+			if (row < 0 || col < 0 || row >= currentLayout.length || col >= currentLayout[0].length) return false;
+			return currentLayout[row][col] == 2;
 		}
 		
 		public void draw(Graphics g) {
@@ -114,8 +131,18 @@ public class Maze {
 					int y = r * 48;
 
 					if (floorImage != null) g2d.drawImage(floorImage, x, y, 48, 48, null);
+					
+					if (isExit(r, c)) {
+						// AUTO-ROTATE EXIT based on which wall it is on
+						double angle = 0;
+						if (c == size - 1) angle = 90;  // Right wall
+						else if (r == size - 1) angle = 180; // Bottom wall
+						else if (c == 0) angle = 270; // Left wall
+						
+						drawRotated(g2d, exitImage, x, y, angle);
+					} 
 
-					if (isWall(r, c)) {
+					else if (isWall(r, c)) {
 						// 1. PERMANENT OUTER FRAME LOGIC
 						if (r == 0 && c == 0) drawRotated(g2d, cornerImage, x, y, 0); 
 						else if (r == 0 && c == size - 1) drawRotated(g2d, cornerImage, x, y, 90);

@@ -130,26 +130,27 @@ public class Player extends Entity{
 	    bullets.add(new Bullet(x, y, facingRight, maze));
 	}
 	
-	public void updateBullets(List<Zombie> zombies, java.util.List<Collectables> coins) {
-	    for (int i = 0; i < bullets.size(); i++) {
-	        Bullet b = bullets.get(i);
-	        b.update();
-	        // Check if bullet hit zombie
-	        for (int j = 0; j < zombies.size(); j++) {
-	            Zombie z = zombies.get(j);
-	            if (Math.abs(b.getX() - z.getX()) < 30 && Math.abs(b.getY() - z.getY()) < 30) {
-	                // remove zombie and replace with coin
-	                zombies.remove(j);
-	                coins.add(new Collectables((int)(z.getX() / 48), (int)(z.getY() / 48)));
-	                b.deactivate();
-	                break;
-	            }
-	        }
-	        // remove inactive
-	        if (!b.isActive()) {
-	            bullets.remove(i);
-	            i--;
-	        }
-	    }
+		public void updateBullets(List<Zombie> zombies, java.util.List<Collectables> coins, GameModel model) {
+		    for (int i = 0; i < bullets.size(); i++) {
+		        Bullet b = bullets.get(i);
+		        b.update();
+		        for (int j = 0; j < zombies.size(); j++) {
+		            Zombie z = zombies.get(j);
+		            if (Math.abs(b.getX() - z.getX()) < 30 && Math.abs(b.getY() - z.getY()) < 30) {
+		                
+		                // ADDED: Tell the model to start a respawn timer
+		                model.startZombieRespawn();
+		                
+		                zombies.remove(j);
+		                coins.add(new Collectables((int)(z.getX() / 48), (int)(z.getY() / 48)));
+		                b.deactivate();
+		                break;
+		            }
+		        }
+		        if (!b.isActive()) {
+		            bullets.remove(i);
+		            i--;
+		        }
+		    }
+		}
 	}
-}
