@@ -85,8 +85,11 @@ public class GameModel {
 				int c = rand.nextInt(10);
 
 				if (!SpawnHelper.isWall(r, c, maze) &&
+					!SpawnHelper.isExitAt(r, c, maze) &&
+					SpawnHelper.isFarFrom(r, count, 1, 1, 5) &&
 					!SpawnHelper.isEntityAt(r, c, player, zombies) &&
-					!SpawnHelper.isCoinAt(r, c, items)) {
+					!SpawnHelper.isCoinAt(r, c, items) &&
+					!SpawnHelper.isGunAt(r, c, gun)) {
 
 					items.add(new Collectables(c, r));
 					valid = true;

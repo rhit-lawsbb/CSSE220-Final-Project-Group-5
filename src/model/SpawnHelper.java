@@ -39,5 +39,18 @@ public class SpawnHelper {
 		}
 		return false;
 	}
+	
+	public static boolean isGunAt(int r, int c, Gun gun) {
+	    if (gun != null && gun.isActive()) {
+	        int gunRow = gun.getY() / 48;
+	        int gunCol = gun.getX() / 48;
+	        return (r == gunRow && c == gunCol);
+	    }
+	    return false;
+	}
+	
+	public static boolean isExitAt(int r, int c, Maze maze) {
+	    return maze.isExit(r, c);
+	}
 
 }
