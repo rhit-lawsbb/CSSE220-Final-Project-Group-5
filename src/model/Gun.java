@@ -20,19 +20,21 @@ public class Gun {
             sprite = null;
         }
     }
+
+    public void respawn(int col, int row) {
+        this.x = col * TILE_SIZE;
+        this.y = row * TILE_SIZE;
+        this.active = true;
+    }
+
     public void draw(Graphics g) {
         if (!active || sprite == null) return;
         g.drawImage(sprite, x, y, TILE_SIZE, TILE_SIZE, null);
     }
     public int getX() { return x; }
     public int getY() { return y; }
-    public boolean isActive() {
-    	return active; 
-    	}
-    
-    public void setActive(boolean active) { 
-    	this.active = active; 
-    	}
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
     
     public boolean collidesWith(Player player) {
         return Math.abs(player.getX() - x) < TILE_SIZE / 2 &&

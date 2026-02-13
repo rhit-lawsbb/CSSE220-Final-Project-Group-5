@@ -4,6 +4,9 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.util.Random;
+
+import javax.swing.Timer;
+
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
@@ -16,6 +19,8 @@ public class GameModel {
 	private Heart heart;
 	private CollisionHandler collisionHandler;
 	private Gun gun;
+	
+	private boolean isGunRespawning = false;
 	
 	private boolean gameOver;
 	private boolean gameWon;
@@ -30,8 +35,7 @@ public class GameModel {
 	public GameModel() {
 		maze = new Maze();
 		player = new Player(1, 1, maze);
-		gun = new Gun(8,8);
-
+		
 		zombies = new ArrayList<>();
 		items = new ArrayList<>();
 		gameOver = false;
@@ -40,8 +44,9 @@ public class GameModel {
 		spawnZombies(2);
 		spawnCoins(8);
 		spawnNewHeart();
+		spawnGun();
 
-		collisionHandler = new CollisionHandler(player, zombies, items);
+		setCollisionHandler(new CollisionHandler(player, zombies, items));
 	}
 	
 	public void startZombieRespawn() {
@@ -111,6 +116,7 @@ public class GameModel {
 			int c = rand.nextInt(10);
 
 			if (!SpawnHelper.isWall(r, c, maze) &&
+				!maze.isExit(r, c) &&
 				!SpawnHelper.isEntityAt(r, c, player, zombies) &&
 				!SpawnHelper.isCoinAt(r, c, items) &&
 				SpawnHelper.isFarFrom(r, c, 1, 1, 3.0)) {
@@ -126,7 +132,7 @@ public class GameModel {
 	// picks up heart on contact and starts a timer to spawn the next one
 	private void tryPickUpHeart() {
 		if (heart == null || !heart.isActive() || isHeartRespawning) return;
-		if (!collisionHandler.checkHeartCollision(heart)) return;
+		if (!getCollisionHandler().checkHeartCollision(heart)) return;
 
 		isHeartRespawning = true;
 
@@ -136,6 +142,43 @@ public class GameModel {
 		});
 		respawnTimer.start();
 	}
+	private void spawnGun() {
+		boolean valid = false;
+		int attempts = 0;
+		while (!valid && attempts < 100) {
+			attempts++;
+			int r = rand.nextInt(10);
+			int c = rand.nextInt(10);
+			if (!SpawnHelper.isWall(r, c, maze) && !maze.isExit(r, c) &&
+				!SpawnHelper.isEntityAt(r, c, player, zombies) && 
+				!SpawnHelper.isCoinAt(r, c, items)) {
+				if (gun == null) gun = new Gun(c, r);
+				else gun.respawn(c, r);
+				valid = true;
+			}
+		}
+	}
+	
+	 private void startGunRespawnTimer() {
+	        isGunRespawning = true;
+	        Timer timer = new Timer(5000, e -> {
+	            boolean valid = false;
+	            while (!valid) {
+	                int r = rand.nextInt(10);
+	                int c = rand.nextInt(10);
+	                if (!SpawnHelper.isWall(r, c, maze) && !SpawnHelper.isExitAt(r, c, maze)) {
+	                    gun.setActive(true);
+	                    // Move gun to new spot or keep original (8,8)
+	                    // gun.setPos(c, r); 
+	                    isGunRespawning = false;
+	                    valid = true;
+	                }
+	            }
+	            ((Timer)e.getSource()).stop();
+	        });
+	        timer.setRepeats(false);
+	        timer.start();
+	    }
 
 	// moves entities, checks collisions, checks game over
 	public void update() {
@@ -154,11 +197,11 @@ public class GameModel {
 		
 		int pr = Math.round(player.getY()/48);
 		int pc = Math.round(player.getX()/48);
-		if (maze.isExit(pr, pc) && collisionHandler.getScore() >= COINS_REQUIRED) {
+		if (maze.isExit(pr, pc) && getCollisionHandler().getScore() >= getCoinsRequired()) {
 			gameWon = true;
 		}
 
-		collisionHandler.checkCollisions();
+		getCollisionHandler().checkCollisions();
 		tryPickUpHeart();
 
 		if (!player.isAlive()) {
@@ -193,13 +236,14 @@ public class GameModel {
 		gameWon = false;
 		isHeartRespawning = false;
 		heartsSpawnedCount = 0;
-		gun = new Gun(8,8);
+
 
 		spawnZombies(2);
 		spawnCoins(8);
 		spawnNewHeart();
+		spawnGun();
 
-		collisionHandler = new CollisionHandler(player, zombies, items);
+		setCollisionHandler(new CollisionHandler(player, zombies, items));
 	}
 
 	// draws everything, plus a game over screen if the player died
@@ -212,9 +256,9 @@ public class GameModel {
 		for (Zombie z : zombies) { z.draw(g); }
 
 		// HUD
-		g.setColor(Color.WHITE);
+		g.setColor(Color.yellow);
 		g.setFont(new Font("Arial", Font.BOLD, 16));
-		g.drawString("Gold: " + collisionHandler.getScore() + "/" + COINS_REQUIRED, 10, 25);
+		g.drawString("Gold: " + getCollisionHandler().getScore() + "/" + getCoinsRequired(), 300, 0);
 
 		if (gameWon) {
 			drawEndScreen(g, "YOU ESCAPED!", Color.GREEN);
@@ -231,14 +275,26 @@ public class GameModel {
 		g.drawString(msg, msg.contains("ESCAPED") ? 65 : 95, 240);
 		g.setColor(Color.WHITE);
 		g.setFont(new Font("Arial", Font.PLAIN, 20));
-		g.drawString("Score: " + collisionHandler.getScore(), 185, 280);
+		g.drawString("Score: " + getCollisionHandler().getScore(), 185, 280);
 		g.drawString("Press R to Restart", 165, 320);
 	}
 
-	public int getScore() { return collisionHandler.getScore(); }
+	public int getScore() { return getCollisionHandler().getScore(); }
 
 	public int getLives() { return player.getLives(); }
+	
+	public Player getPlayer() { return player; }
 
-	public boolean isGameOver() { return gameOver; }
+	public CollisionHandler getCollisionHandler() {
+		return collisionHandler;
+	}
+
+	public void setCollisionHandler(CollisionHandler collisionHandler) {
+		this.collisionHandler = collisionHandler;
+	}
+
+	public int getCoinsRequired() {
+		return COINS_REQUIRED;
+	}
 
 }
