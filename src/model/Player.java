@@ -100,6 +100,8 @@ public class Player extends Entity {
 		}
 	}
 
+	// test
+
 	public void loseLife() { if (lives > 0) { lives--; updateSprite(); } }
 	public void gainLife() { if (lives < 3) { lives++; updateSprite(); } }
 	private void updateSprite() {

@@ -3,6 +3,8 @@ package model;
 import java.awt.Color;
 import java.awt.Graphics;
 
+// test
+
 public class Armor {
 	private int x, y;
 	private boolean active = true;
