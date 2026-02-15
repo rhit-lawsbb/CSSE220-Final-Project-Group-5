@@ -28,6 +28,7 @@ public class GameModel {
 	private boolean gameOver;
 	private boolean playingDeathVideo = false;
 	private boolean playingWinVideo = false;
+	private boolean playingTreasureVideo = false;
 	private boolean gameWon;
 	private static final int COINS_PER_LEVEL = 5;
 	private int level = 1;
@@ -206,7 +207,11 @@ public class GameModel {
 	 public void levels(){
 		 level++;
 		 if (level > 5) {
-			 gameWon = true;
+			 playingTreasureVideo = true;
+			 TreasureCutscenePlayer.playVideo(() -> {
+				 playingTreasureVideo = false;
+				 gameWon = true;
+			 });
 			 return;
 		 }
 
@@ -251,7 +256,7 @@ public class GameModel {
 
 	// moves entities, checks collisions, checks game over bo
 	public void update() {
-		if (gameOver || gameWon || playingDeathVideo || playingWinVideo) return;
+		if (gameOver || gameWon || playingDeathVideo || playingWinVideo || playingTreasureVideo) return;
 
 		player.update();
 		
@@ -322,6 +327,7 @@ public class GameModel {
 		gameOver = false;
 		playingDeathVideo = false;
 		playingWinVideo = false;
+		playingTreasureVideo = false;
 		gameWon = false;
 		isHeartRespawning = false;
 		heartsSpawnedCount = 0;
@@ -351,6 +357,16 @@ public class GameModel {
 			g.setColor(Color.BLACK);
 			g.fillRect(0, 0, 480, 480);
 			Image frame = WinVideoPlayer.getVideoImage();
+			if (frame != null) {
+				g.drawImage(frame, 0, 0, 480, 480, observer);
+			}
+			return;
+		}
+
+		if (playingTreasureVideo) {
+			g.setColor(Color.BLACK);
+			g.fillRect(0, 0, 480, 480);
+			Image frame = TreasureCutscenePlayer.getVideoImage();
 			if (frame != null) {
 				g.drawImage(frame, 0, 0, 480, 480, observer);
 			}
