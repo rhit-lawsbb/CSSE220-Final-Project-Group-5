@@ -14,11 +14,6 @@ public class Player extends Entity {
 	private int lives;
 	private BufferedImage[] rightSprites;
 	private BufferedImage[] leftSprites;
-<<<<<<< HEAD
-=======
-	
-	
->>>>>>> 4645a221995ed07366886b0d816647b032c019c1
 	private boolean hasGun = false;
 	private int ammo = 0;
 	private static final int MAX_AMMO = 8;
@@ -75,10 +70,6 @@ public class Player extends Entity {
 	public void shoot() {
 		if (!hasGun || ammo <= 0) return;
 		bullets.add(new Bullet(x, y, facingRight, maze));
-<<<<<<< HEAD
-=======
-		
->>>>>>> 4645a221995ed07366886b0d816647b032c019c1
 		ammo--;
 		if (ammo <= 0) hasGun = false;
 	}
