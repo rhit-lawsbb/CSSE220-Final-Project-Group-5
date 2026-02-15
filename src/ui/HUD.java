@@ -23,27 +23,25 @@ public class HUD {
 
     public void draw(Graphics g) {
         g.setColor(new Color(0, 0, 0, 150));
-        g.fillRect(0, 0, 480, 45); 
+        g.fillRect(0, 0, 480, 50);
+
+        g.setFont(new Font("Arial", Font.BOLD, 14));
 
         if (heartSprite != null) {
             for (int i = 0; i < model.getLives(); i++) {
-                g.drawImage(heartSprite, 10 + (i * 45), 7, 35, 35, null);
+                g.drawImage(heartSprite, 10 + (i * 35), 5, 30, 30, null);
             }
         }
-        
-        
-        g.setFont(new Font("Arial", Font.BOLD, 16));
+
+        g.setColor(Color.WHITE);
+        g.drawString("Lvl " + model.getLevel(), 120, 20);
+
         g.setColor(Color.YELLOW);
-        g.drawString("Score: " + model.getScore(), 400, 30);
-        
+        g.drawString("Gold: " + model.getScore() + "/" + model.getCoinsRequired(), 120, 40);
+
         if (model.getPlayer().hasGun()) {
             g.setColor(Color.WHITE);
-            g.drawString("Ammo: " + model.getPlayer().getAmmo(), 220, 30);
+            g.drawString("Ammo: " + model.getPlayer().getAmmo(), 300, 20);
         }
-     // 4. Draw Goal Progress (Gold: Current/Required)
-        g.setColor(Color.YELLOW);
-        // This combines your score with the required constant from the model
-        String goalText = "Gold: " + model.getScore() + " / " + model.getCoinsRequired();
-        g.drawString(goalText, 310, 30);
     }
 }

@@ -14,8 +14,6 @@ public class Player extends Entity {
 	private int lives;
 	private BufferedImage[] rightSprites;
 	private BufferedImage[] leftSprites;
-	soundManager soundmanager = new soundManager();
-	
 	private boolean hasGun = false;
 	private int ammo = 0;
 	private static final int MAX_AMMO = 8;
@@ -72,7 +70,6 @@ public class Player extends Entity {
 	public void shoot() {
 		if (!hasGun || ammo <= 0) return;
 		bullets.add(new Bullet(x, y, facingRight, maze));
-		soundmanager.playSound("GunShot.wav");
 		ammo--;
 		if (ammo <= 0) hasGun = false;
 	}

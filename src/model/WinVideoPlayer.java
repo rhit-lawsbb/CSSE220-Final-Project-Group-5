@@ -1,6 +1,7 @@
 package model;
 
 import java.awt.Image;
+import java.awt.Toolkit;
 import javax.swing.ImageIcon;
 import javax.swing.Timer;
 
@@ -9,8 +10,11 @@ public class WinVideoPlayer {
 	private static final int VIDEO_DURATION_MS = 8000;
 
 	public static void loadVideo() {
-		ImageIcon icon = new ImageIcon("win_cutscene.gif");
-		videoImage = icon.getImage();
+		if (videoImage != null) {
+			videoImage.flush();
+		}
+		Image fresh = Toolkit.getDefaultToolkit().createImage("win_cutscene.gif");
+		videoImage = new ImageIcon(fresh).getImage();
 	}
 
 	public static Image getVideoImage() {

@@ -22,13 +22,17 @@ public class GameModel {
 	private CollisionHandler collisionHandler;
 	private Gun gun;
 	
+	private Armor armor;
 	private boolean isGunRespawning = false;
 	
 	private boolean gameOver;
 	private boolean playingDeathVideo = false;
 	private boolean playingWinVideo = false;
 	private boolean gameWon;
-	private static final int COINS_REQUIRED = 5;
+	private static final int COINS_PER_LEVEL = 5;
+	private int level = 1;
+	private int zombieDamage = 1;
+	private int coinsRequired = COINS_PER_LEVEL;
 
 	private Random rand = new Random();
 	private boolean isHeartRespawning = false;
@@ -50,9 +54,9 @@ public class GameModel {
 		spawnNewHeart();
 		spawnGun();
 
-		setCollisionHandler(new CollisionHandler(player, zombies, items));
+		setCollisionHandler(new CollisionHandler(player, zombies, items, zombieDamage));
 	}
-	
+
 	public void startZombieRespawn() {
 		javax.swing.Timer respawnTimer = new javax.swing.Timer(7000, e -> {
 			if (!gameOver && !gameWon) {
@@ -163,6 +167,22 @@ public class GameModel {
 		}
 	}
 	
+	private void spawnArmor() {
+		boolean valid = false;
+		int attempts = 0;
+		while (!valid && attempts < 100) {
+			attempts++;
+			int r = rand.nextInt(10);
+			int c = rand.nextInt(10);
+			if (!SpawnHelper.isWall(r, c, maze) && !maze.isExit(r, c) &&
+				!SpawnHelper.isEntityAt(r, c, player, zombies) &&
+				!SpawnHelper.isCoinAt(r, c, items)) {
+				armor = new Armor(c, r);
+				valid = true;
+			}
+		}
+	}
+
 	 private void startGunRespawnTimer() {
 	        isGunRespawning = true;
 	        Timer timer = new Timer(5000, e -> {
@@ -184,24 +204,49 @@ public class GameModel {
 	        timer.start();
 	    }
 	 public void levels(){
+		 level++;
+		 if (level > 5) {
+			 gameWon = true;
+			 return;
+		 }
+
+		 int prevScore = getCollisionHandler().getScore();
+
+		 int zombieCount;
+		 switch (level) {
+			 case 2: zombieCount = 3; zombieDamage = 1; break;
+			 case 3: zombieCount = 3; zombieDamage = 2; break;
+			 case 4: zombieCount = 4; zombieDamage = 1; break;
+			 case 5: zombieCount = 4; zombieDamage = 2; break;
+			 default: zombieCount = 2; zombieDamage = 1; break;
+		 }
+
+		 coinsRequired = prevScore + COINS_PER_LEVEL;
+
 		 maze = new Maze();
-			player = new Player(1, 1, maze);
-			zombies = new ArrayList<>();
-			items = new ArrayList<>();
-			gameOver = false;
-			playingDeathVideo = false;
-			playingWinVideo = false;
-			gameWon = false;
-			isHeartRespawning = false;
-			heartsSpawnedCount = 0;
+		 player = new Player(1, 1, maze);
+		 zombies = new ArrayList<>();
+		 items = new ArrayList<>();
+		 gameOver = false;
+		 playingDeathVideo = false;
+		 playingWinVideo = false;
+		 isHeartRespawning = false;
+		 heartsSpawnedCount = 0;
 
+		 spawnZombies(zombieCount);
+		 spawnCoins(8);
+		 spawnNewHeart();
+		 spawnGun();
 
-			spawnZombies(3);
-			spawnCoins(6);
-			spawnNewHeart();
-			spawnGun();
+		 if (level >= 3) {
+			 spawnArmor();
+		 } else {
+			 armor = null;
+		 }
 
-			setCollisionHandler(new CollisionHandler(player, zombies, items));
+		 CollisionHandler newHandler = new CollisionHandler(player, zombies, items, zombieDamage);
+		 newHandler.addScore(prevScore);
+		 setCollisionHandler(newHandler);
 	 }
 
 	// moves entities, checks collisions, checks game over bo
@@ -213,6 +258,12 @@ public class GameModel {
 		if (gun != null && gun.isActive() && gun.collidesWith(player)) {
 		    player.pickupGun();
 		    gun.setActive(false);
+		}
+		if (armor != null && armor.isActive() &&
+			Math.abs(player.getX() - armor.getX()) < 36 &&
+			Math.abs(player.getY() - armor.getY()) < 36) {
+			armor.setActive(false);
+			getCollisionHandler().setDamage(Math.max(1, zombieDamage / 2));
 		}
 		player.updateBullets(zombies, items, this);
 		for (Zombie z : zombies) {
@@ -260,6 +311,10 @@ public class GameModel {
 
 	// resets everything back to a fresh game
 	private void restart() {
+		level = 1;
+		zombieDamage = 1;
+		coinsRequired = COINS_PER_LEVEL;
+
 		maze = new Maze();
 		player = new Player(1, 1, maze);
 		zombies = new ArrayList<>();
@@ -270,14 +325,14 @@ public class GameModel {
 		gameWon = false;
 		isHeartRespawning = false;
 		heartsSpawnedCount = 0;
-
+		armor = null;
 
 		spawnZombies(2);
 		spawnCoins(8);
 		spawnNewHeart();
 		spawnGun();
 
-		setCollisionHandler(new CollisionHandler(player, zombies, items));
+		setCollisionHandler(new CollisionHandler(player, zombies, items, zombieDamage));
 	}
 
 	// draws everything, plus a game over screen if the player died
@@ -306,16 +361,12 @@ public class GameModel {
 		for (Collectables item : items) { item.draw(g); }
 		if (heart != null && heart.isActive()) { heart.draw(g); }
 		if (gun.isActive()) { gun.draw(g); }
+		if (armor != null && armor.isActive()) { armor.draw(g); }
 		player.draw(g);
 		for (Zombie z : zombies) { z.draw(g); }
 
-		// HUD
-		g.setColor(Color.yellow);
-		g.setFont(new Font("Arial", Font.BOLD, 16));
-		g.drawString("Gold: " + getCollisionHandler().getScore() + "/" + getCoinsRequired(), 300, 0);
-
 		if (gameWon) {
-			drawEndScreen(g, "YOU ESCAPED!", Color.GREEN);
+			drawEndScreen(g, "YOU WIN!", Color.GREEN);
 		} else if (gameOver) {
 			drawEndScreen(g, "GAME OVER", Color.RED);
 		}
@@ -326,7 +377,7 @@ public class GameModel {
 		g.fillRect(0, 0, 480, 480);
 		g.setColor(color);
 		g.setFont(new Font("Arial", Font.BOLD, 48));
-		g.drawString(msg, msg.contains("ESCAPED") ? 65 : 95, 240);
+		g.drawString(msg, msg.contains("WIN") ? 100 : 95, 240);
 		g.setColor(Color.WHITE);
 		g.setFont(new Font("Arial", Font.PLAIN, 20));
 		g.drawString("Score: " + getCollisionHandler().getScore(), 185, 280);
@@ -348,7 +399,11 @@ public class GameModel {
 	}
 
 	public int getCoinsRequired() {
-		return COINS_REQUIRED;
+		return coinsRequired;
+	}
+
+	public int getLevel() {
+		return level;
 	}
 
 	public boolean isGameOver() { return gameOver; }

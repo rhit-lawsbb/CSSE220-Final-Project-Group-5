@@ -9,13 +9,15 @@ public class CollisionHandler {
 	private ArrayList<Collectables> items;
 	private int score;
 	private int hitCooldown;
+	private int damage;
 
-	public CollisionHandler(Player player, ArrayList<Zombie> zombies, ArrayList<Collectables> items) {
+	public CollisionHandler(Player player, ArrayList<Zombie> zombies, ArrayList<Collectables> items, int damage) {
 		this.player = player;
 		this.zombies = zombies;
 		this.items = items;
 		this.score = 0;
 		this.hitCooldown = 0;
+		this.damage = damage;
 	}
 
 	// runs all collision checks each frame
@@ -49,7 +51,9 @@ public class CollisionHandler {
 		}
 		for (Zombie z : zombies) {
 			if (overlaps(player.getX(), player.getY(), z.getX(), z.getY())) {
-				player.loseLife();
+				for (int i = 0; i < damage; i++) {
+					player.loseLife();
+				}
 				hitCooldown = 15;
 				break;
 			}
@@ -68,4 +72,6 @@ public class CollisionHandler {
 	}
 
 	public int getScore() { return score; }
+	public void addScore(int points) { score += points; }
+	public void setDamage(int damage) { this.damage = damage; }
 }
