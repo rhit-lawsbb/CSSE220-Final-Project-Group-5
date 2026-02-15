@@ -183,8 +183,28 @@ public class GameModel {
 	        timer.setRepeats(false);
 	        timer.start();
 	    }
+	 public void levels(){
+		 maze = new Maze();
+			player = new Player(1, 1, maze);
+			zombies = new ArrayList<>();
+			items = new ArrayList<>();
+			gameOver = false;
+			playingDeathVideo = false;
+			playingWinVideo = false;
+			gameWon = false;
+			isHeartRespawning = false;
+			heartsSpawnedCount = 0;
 
-	// moves entities, checks collisions, checks game over
+
+			spawnZombies(3);
+			spawnCoins(6);
+			spawnNewHeart();
+			spawnGun();
+
+			setCollisionHandler(new CollisionHandler(player, zombies, items));
+	 }
+
+	// moves entities, checks collisions, checks game over bo
 	public void update() {
 		if (gameOver || gameWon || playingDeathVideo || playingWinVideo) return;
 
@@ -205,7 +225,7 @@ public class GameModel {
 			playingWinVideo = true;
 			WinVideoPlayer.playVideo(() -> {
 				playingWinVideo = false;
-				gameWon = true;
+				levels();
 			});
 		}
 
