@@ -4,12 +4,12 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 import javax.swing.Timer;
 
-public class DeathVideoPlayer {
+public class WinVideoPlayer {
 	private static Image videoImage;
 	private static final int VIDEO_DURATION_MS = 8000;
 
 	public static void loadVideo() {
-		ImageIcon icon = new ImageIcon("death_cutscene.gif");
+		ImageIcon icon = new ImageIcon("win_cutscene.gif");
 		videoImage = icon.getImage();
 	}
 

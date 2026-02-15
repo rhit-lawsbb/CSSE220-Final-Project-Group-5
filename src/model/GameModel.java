@@ -26,6 +26,7 @@ public class GameModel {
 	
 	private boolean gameOver;
 	private boolean playingDeathVideo = false;
+	private boolean playingWinVideo = false;
 	private boolean gameWon;
 	private static final int COINS_REQUIRED = 5;
 
@@ -185,7 +186,7 @@ public class GameModel {
 
 	// moves entities, checks collisions, checks game over
 	public void update() {
-		if (gameOver || gameWon || playingDeathVideo) return;
+		if (gameOver || gameWon || playingDeathVideo || playingWinVideo) return;
 
 		player.update();
 		
@@ -200,8 +201,12 @@ public class GameModel {
 		
 		int pr = Math.round(player.getY()/48);
 		int pc = Math.round(player.getX()/48);
-		if (maze.isExit(pr, pc) && getCollisionHandler().getScore() >= getCoinsRequired()) {
-			gameWon = true;
+		if (maze.isExit(pr, pc) && getCollisionHandler().getScore() >= getCoinsRequired() && !playingWinVideo) {
+			playingWinVideo = true;
+			WinVideoPlayer.playVideo(() -> {
+				playingWinVideo = false;
+				gameWon = true;
+			});
 		}
 
 		getCollisionHandler().checkCollisions();
@@ -241,6 +246,7 @@ public class GameModel {
 		items = new ArrayList<>();
 		gameOver = false;
 		playingDeathVideo = false;
+		playingWinVideo = false;
 		gameWon = false;
 		isHeartRespawning = false;
 		heartsSpawnedCount = 0;
@@ -260,6 +266,16 @@ public class GameModel {
 			g.setColor(Color.BLACK);
 			g.fillRect(0, 0, 480, 480);
 			Image frame = DeathVideoPlayer.getVideoImage();
+			if (frame != null) {
+				g.drawImage(frame, 0, 0, 480, 480, observer);
+			}
+			return;
+		}
+
+		if (playingWinVideo) {
+			g.setColor(Color.BLACK);
+			g.fillRect(0, 0, 480, 480);
+			Image frame = WinVideoPlayer.getVideoImage();
 			if (frame != null) {
 				g.drawImage(frame, 0, 0, 480, 480, observer);
 			}
@@ -318,4 +334,6 @@ public class GameModel {
 	public boolean isGameOver() { return gameOver; }
 
 	public boolean isPlayingDeathVideo() { return playingDeathVideo; }
+
+	public boolean isPlayingWinVideo() { return playingWinVideo; }
 }

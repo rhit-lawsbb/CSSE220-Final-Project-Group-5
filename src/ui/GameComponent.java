@@ -39,7 +39,7 @@ public class GameComponent extends JComponent implements ActionListener, KeyList
 
 	if (model != null) {
 		model.draw(g, this);
-		if (!model.isPlayingDeathVideo()) {
+		if (!model.isPlayingDeathVideo() && !model.isPlayingWinVideo()) {
 			hud.draw(g);
 		}
 	}else {
