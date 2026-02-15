@@ -3,9 +3,19 @@ package model;
 import java.util.ArrayList;
 
 public class SpawnHelper {
-	
 	public static boolean isWall(int r, int c, Maze maze) {
 		return maze.isWall(r, c);
+	}
+	
+	public static boolean isExitAt(int r, int c, Maze maze) {
+		return maze.isExit(r, c);
+	}
+	
+	public static boolean isGunAt(int r, int c, Gun gun) {
+		if (gun != null && gun.isActive()) {
+			return Math.round(gun.getY() / 48) == r && Math.round(gun.getX() / 48) == c;
+		}
+		return false;
 	}
 	
 	public static boolean isFarFrom(int r, int c, int targetR, int targetC, double minDist) {
@@ -39,5 +49,4 @@ public class SpawnHelper {
 		}
 		return false;
 	}
-
 }
