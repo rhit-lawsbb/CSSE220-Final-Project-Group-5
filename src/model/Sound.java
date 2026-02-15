@@ -8,7 +8,7 @@ import java.net.URL;
 public class Sound {
 	public static void playSound(String fileName) {
         try {
-            // This approach works whether the sound is in a folder or inside a JAR
+            
             URL url = Sound.class.getResource("/sounds/" + fileName);
             if (url == null) {
                 System.err.println("Could not find file: " + fileName);

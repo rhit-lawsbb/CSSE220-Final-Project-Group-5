@@ -71,6 +71,7 @@ public class Player extends Entity {
 	public void shoot() {
 		if (!hasGun || ammo <= 0) return;
 		bullets.add(new Bullet(x, y, facingRight, maze));
+		Sound.playSound("GunShot.wav");
 		ammo--;
 		if (ammo <= 0) hasGun = false;
 	}
