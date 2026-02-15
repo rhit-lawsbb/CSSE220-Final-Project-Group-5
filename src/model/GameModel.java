@@ -12,7 +12,7 @@ import javax.swing.Timer;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
-// main game class
+// main game class test
 public class GameModel {
 	private Maze maze;
 	private Player player;
