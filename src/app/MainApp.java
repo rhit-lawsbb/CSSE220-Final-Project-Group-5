@@ -9,6 +9,11 @@ import ui.GameWindow;
  * @author Group 5
  * <br>Purpose: Top level class for CSSE220 Project containing main method 
  * Entry point for the final project.
+ * Launches game window and starts the ui overlay
+ * <br>Restrictions: No game or render logic is in this class,
+ * only responsibility in this class is starting the app
+ * <br> for example:
+ * MainApp.main(new String[]{});
  * TODO: change-ben
  */
 public class MainApp {
