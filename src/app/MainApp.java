@@ -5,7 +5,7 @@ import javax.swing.SwingUtilities;
 import ui.GameWindow;
 
 /**
- * Class: MainApp
+ * Class: MainApp 
  * @author Group 5
  * <br>Purpose: Top level class for CSSE220 Project containing main method 
  * Entry point for the final project.
