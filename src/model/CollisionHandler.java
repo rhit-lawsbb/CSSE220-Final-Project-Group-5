@@ -36,7 +36,7 @@ public class CollisionHandler {
 		this.maze = maze;
 		this.zombieDeathListener = listener;
 		this.coinSound = loadSound("coin_pickup.wav");
-		this.heartSound = loadSound("heart_pickup.wav");
+		this.heartSound = loadSound("Health_Pickup.wav");
 		this.damageSound = loadSound("damage.wav");
 	}
 
