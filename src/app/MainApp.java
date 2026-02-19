@@ -14,7 +14,7 @@ import ui.GameWindow;
  * only responsibility in this class is starting the app
  * <br> for example:
  * MainApp.main(new String[]{});
- * TODO: change-ben
+ * 
  */
 public class MainApp {
 	
