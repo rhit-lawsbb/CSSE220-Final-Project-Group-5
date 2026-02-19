@@ -45,6 +45,8 @@ public class GameModel implements ZombieDeathListener {
 	private int gunRespawnCounter = 0;
 
 	private Clip backgroundMusic;
+	private Clip levelCompleteSound;
+	private Clip gunShootSound;
 
 	// sets up the maze, player, enemies, and collectibles
 	public GameModel() {
@@ -53,6 +55,8 @@ public class GameModel implements ZombieDeathListener {
 		coinsRequired = COINS_PER_LEVEL;
 		initLevel(2, 0);
 		playBackgroundMusic();
+		this.levelCompleteSound = loadSound("level_complete.wav");
+		this.gunShootSound = loadSound("gun_sound.wav");
 	}
 
 	private void playBackgroundMusic() {
@@ -68,6 +72,25 @@ public class GameModel implements ZombieDeathListener {
 		} catch (Exception e) {
 			System.out.println("Music error: " + e.getMessage());
 		}
+	}
+
+	private Clip loadSound(String filename) {
+		try {
+			AudioInputStream audioIn = AudioSystem.getAudioInputStream(
+				getClass().getResource(filename));
+			Clip clip = AudioSystem.getClip();
+			clip.open(audioIn);
+			return clip;
+		} catch (Exception e) {
+			System.out.println("Sound load error: " + e.getMessage());
+			return null;
+		}
+	}
+
+	private void playSound(Clip clip) {
+		if (clip == null) return;
+		clip.setFramePosition(0);
+		clip.start();
 	}
 
 	private void initLevel(int zombieCount, int previousScore) {
@@ -304,6 +327,7 @@ public class GameModel implements ZombieDeathListener {
 		int pr = (int)(player.getY()/Maze.TILE_SIZE);
 		int pc = (int)(player.getX()/Maze.TILE_SIZE);
 		if (maze.isExit(pr, pc) && collisionHandler.getScore() >= getCoinsRequired()) {
+			playSound(levelCompleteSound);
 			levels();
 		}
 
@@ -315,6 +339,7 @@ public class GameModel implements ZombieDeathListener {
 	// passes key input to player
 	public void handleKey(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_F) {
+		    if (player.hasGun()) playSound(gunShootSound);
 		    player.shoot();
 		}
 		if (gameOver || gameWon) {

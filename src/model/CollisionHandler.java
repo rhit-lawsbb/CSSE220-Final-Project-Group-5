@@ -24,6 +24,8 @@ public class CollisionHandler {
 	private Clip coinSound;
 	private Clip heartSound;
 	private Clip damageSound;
+	private Clip armorSound;
+	private Clip gunPickupSound;
 
 	public CollisionHandler(Player player, ArrayList<Zombie> zombies, ArrayList<Collectables> items,
 							int damage, Maze maze, ZombieDeathListener listener) {
@@ -36,8 +38,10 @@ public class CollisionHandler {
 		this.maze = maze;
 		this.zombieDeathListener = listener;
 		this.coinSound = loadSound("coin_pickup.wav");
-		this.heartSound = loadSound("Health_Pickup.wav");
+		this.heartSound = loadSound("health_pickup.wav");
 		this.damageSound = loadSound("damage.wav");
+		this.armorSound = loadSound("armor_pickup.wav");
+		this.gunPickupSound = loadSound("gun_pickup.wav");
 	}
 
 	private Clip loadSound(String filename) {
@@ -113,6 +117,7 @@ public class CollisionHandler {
 		if (overlaps(player.getX(), player.getY(), gun.getX(), gun.getY(), Maze.TILE_SIZE / 2)) {
 			player.pickupGun();
 			gun.setActive(false);
+			playSound(gunPickupSound);
 		}
 	}
 
@@ -121,6 +126,7 @@ public class CollisionHandler {
 		if (overlaps(player.getX(), player.getY(), armor.getX(), armor.getY(), 36)) {
 			armor.setActive(false);
 			damage = Math.max(1, damage / 2);
+			playSound(armorSound);
 		}
 	}
 
