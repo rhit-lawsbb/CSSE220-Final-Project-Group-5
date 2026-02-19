@@ -9,8 +9,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 public class Player extends Entity {
-	private int dx;
-	private int dy;
+	private Direction direction = Direction.RIGHT;
 	private int lives;
 	private BufferedImage[] rightSprites;
 	private BufferedImage[] leftSprites;
@@ -41,64 +40,51 @@ public class Player extends Entity {
 	public void handleKey(KeyEvent e) {
 		int key = e.getKeyCode();
 		if (key == KeyEvent.VK_W || key == KeyEvent.VK_UP) {
-			dx = 0; dy = -1;
+			direction = Direction.UP;
 		} else if (key == KeyEvent.VK_S || key == KeyEvent.VK_DOWN) {
-			dx = 0; dy = 1;
+			direction = Direction.DOWN;
 		} else if (key == KeyEvent.VK_A || key == KeyEvent.VK_LEFT) {
-			dx = -1; dy = 0;
-			facingRight = false;
+			direction = Direction.LEFT;
+			setFacingRight(false);
 		} else if (key == KeyEvent.VK_D || key == KeyEvent.VK_RIGHT) {
-			dx = 1; dy = 0;
-			facingRight = true;
+			direction = Direction.RIGHT;
+			setFacingRight(true);
 		}
 	}
 
 	public void update() {
-		float nextX = x + dx * STEP;
-		float nextY = y + dy * STEP;
+		double nextX = getX() + direction.getDx() * STEP;
+		double nextY = getY() + direction.getDy() * STEP;
 		if (canMoveTo(nextX, nextY)) {
-			x = nextX;
-			y = nextY;
+			setX(nextX);
+			setY(nextY);
 		}
 	}
 
-	public void pickupGun() { 
-		hasGun = true; 
+	public void pickupGun() {
+		hasGun = true;
 		ammo = MAX_AMMO;
 	}
 
 	public void shoot() {
 		if (!hasGun || ammo <= 0) return;
-		bullets.add(new Bullet(x, y, facingRight, maze));
+		bullets.add(new Bullet(getX(), getY(), isFacingRight(), getMaze()));
 		ammo--;
 		if (ammo <= 0) hasGun = false;
 	}
 
-	public void updateBullets(List<Zombie> zombies, java.util.List<Collectables> coins, GameModel model) {
+	public void updateBullets() {
 		for (int i = 0; i < bullets.size(); i++) {
 			Bullet b = bullets.get(i);
 			b.update();
-			for (int j = 0; j < zombies.size(); j++) {
-				Zombie z = zombies.get(j);
-				if (Math.abs(b.getX() - z.getX()) < 30 && Math.abs(b.getY() - z.getY()) < 30) {
-					model.startZombieRespawn();
-					int dropRow = Math.round(z.getY() / 48);
-					int dropCol = Math.round(z.getX() / 48);
-					// FIX: No coin drop in walls or on exit
-					if (!maze.isWall(dropRow, dropCol) && !maze.isExit(dropRow, dropCol)) {
-						coins.add(new Collectables(dropCol, dropRow));
-					}
-					zombies.remove(j);
-					b.deactivate();
-					break;
-				}
-			}
 			if (!b.isActive()) {
 				bullets.remove(i);
 				i--;
 			}
 		}
 	}
+
+	public List<Bullet> getBullets() { return bullets; }
 
 	// test
 
@@ -108,8 +94,8 @@ public class Player extends Entity {
 		int index = 3 - lives;
 		if (index < 0) index = 0;
 		if (index > 2) index = 2;
-		spriteRight = rightSprites[index];
-		spriteLeft = leftSprites[index];
+		setSpriteRight(rightSprites[index]);
+		setSpriteLeft(leftSprites[index]);
 	}
 	public int getLives() { return lives; }
 	public boolean isAlive() { return lives > 0; }
@@ -118,8 +104,8 @@ public class Player extends Entity {
 
 	@Override
 	public void draw(Graphics g) {
-		BufferedImage currentSprite = facingRight ? spriteRight : spriteLeft;
-		if (currentSprite != null) g.drawImage(currentSprite, Math.round(x), Math.round(y), 48, 48, null);
+		BufferedImage currentSprite = isFacingRight() ? getSpriteRight() : getSpriteLeft();
+		if (currentSprite != null) g.drawImage(currentSprite, (int) getX(), (int) getY(), Maze.TILE_SIZE, Maze.TILE_SIZE, null);
 		for (Bullet b : bullets) b.draw(g);
 	}
 }

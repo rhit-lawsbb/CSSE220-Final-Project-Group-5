@@ -1,11 +1,17 @@
 package model;
 // Defines dx and dy and the rate they move
 public enum Direction {
-	UP(0,-1), DOWN(0,1), LEFT(-1,0), RIGHT(1,0);
+	UP, DOWN, LEFT, RIGHT;
 
-	public final int dx, dy;
-	Direction(int dx, int dy) {
-		this.dx = dx;
-		this.dy =dy;
+	public int getDx() {
+		if (this == LEFT) return -1;
+		if (this == RIGHT) return 1;
+		return 0;
+	}
+
+	public int getDy() {
+		if (this == UP) return -1;
+		if (this == DOWN) return 1;
+		return 0;
 	}
 }

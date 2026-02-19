@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import model.GameModel;
+import model.Maze;
 
 public class HUD {
     private GameModel model;
@@ -23,7 +24,7 @@ public class HUD {
 
     public void draw(Graphics g) {
         g.setColor(new Color(0, 0, 0, 150));
-        g.fillRect(0, 0, 480, 50);
+        g.fillRect(0, 0, Maze.TILE_SIZE * 10, 50);
 
         g.setFont(new Font("Arial", Font.BOLD, 14));
 

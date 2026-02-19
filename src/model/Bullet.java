@@ -3,29 +3,28 @@ package model;
 import java.awt.Color;
 import java.awt.Graphics;
 public class Bullet {
-    private float x, y;
-    private int dx;
-    private int dy;
+    private double x, y;
+    private Direction direction;
     private boolean active = true;
     private Maze maze;
     private static final int SPEED = 12;
     private static final int SIZE = 10;
-    public Bullet(float startX, float startY, boolean facingRight, Maze maze) {
+    public Bullet(double startX, double startY, boolean facingRight, Maze maze) {
         this.maze = maze;
-        this.x = startX + 20; // spawn near player’s center
+        this.x = startX + 20; // spawn near player's center
         this.y = startY + 20;
         if (facingRight) {
-            dx = 1; dy = 0;
+            direction = Direction.RIGHT;
         } else {
-            dx = -1; dy = 0;
+            direction = Direction.LEFT;
         }
     }
     public void update() {
         if (!active) return;
-        float nextX = x + dx * SPEED;
-        float nextY = y + dy * SPEED;
-        int tileCol = (int)(nextX / 48);
-        int tileRow = (int)(nextY / 48);
+        double nextX = x + direction.getDx() * SPEED;
+        double nextY = y + direction.getDy() * SPEED;
+        int tileCol = (int)(nextX / Maze.TILE_SIZE);
+        int tileRow = (int)(nextY / Maze.TILE_SIZE);
         if (maze.isWall(tileRow, tileCol)) {
             active = false;
             return;
@@ -36,10 +35,10 @@ public class Bullet {
     public void draw(Graphics g) {
         if (!active) return;
         g.setColor(Color.YELLOW);
-        g.fillOval(Math.round(x), Math.round(y), SIZE, SIZE);
+        g.fillOval((int) x, (int) y, SIZE, SIZE);
     }
     public boolean isActive() { return active; }
     public void deactivate() { active = false; }
-    public float getX() { return x; }
-    public float getY() { return y; }
+    public double getX() { return x; }
+    public double getY() { return y; }
 }

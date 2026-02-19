@@ -9,7 +9,7 @@ import ui.GameWindow;
  * @author Group 5
  * <br>Purpose: Top level class for CSSE220 Project containing main method 
  * Entry point for the final project.
- * change-ben
+ * TODO: change-ben
  */
 public class MainApp {
 	

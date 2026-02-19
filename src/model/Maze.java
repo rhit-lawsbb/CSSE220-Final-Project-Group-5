@@ -3,148 +3,177 @@ package model;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Random;
 import javax.imageio.ImageIO;
 
 public class Maze {
+	 public static final int TILE_SIZE = 48;
+
 	 private BufferedImage floorImage;
 	 private BufferedImage cornerImage;
 	 private BufferedImage sideImage;
-	 
-	 private BufferedImage exitImage;
-	 
-	private int[][][] layouts = {
+
+	 private BufferedImage exitBase;
+	 private BufferedImage exitTop;
+
+	 // 0=floor, 1=wall, 2=exit, 3=player spawn, 4=zombie spawn
+	 private ArrayList<int[][]> layouts;
+	 private int[][] currentLayout;
+
+		public Maze() {
+			layouts = new ArrayList<>();
+
 			//Layout 1
-			{
+			layouts.add(new int[][] {
 				{1,1,1,1,1,1,1,1,1,1},
-				{1,0,0,0,0,0,1,0,0,2},
+				{1,3,0,0,0,0,1,0,0,2},
 				{1,0,1,1,1,0,1,0,1,1},
-				{1,0,0,0,1,0,0,0,0,1},
+				{1,0,0,0,1,0,0,4,0,1},
 				{1,1,1,0,1,1,1,1,0,1},
-				{1,0,0,0,0,0,0,1,0,1},
+				{1,4,0,0,0,0,0,1,0,1},
 				{1,0,1,1,1,1,1,1,0,1},
-				{1,0,0,0,0,0,0,0,0,1},
+				{1,4,0,0,0,0,0,0,4,1},
 				{1,0,1,1,1,1,1,1,0,1},
 				{1,1,1,1,1,1,1,1,1,1}
-			},
+			});
+
 			//Layout 2
-			{
+			layouts.add(new int[][] {
 				{1,1,1,1,1,1,1,1,1,1},
-				{1,0,0,0,1,0,0,0,0,1},
+				{1,3,0,0,1,0,0,0,0,1},
 				{1,0,1,1,1,1,0,1,0,1},
 				{1,0,1,0,0,0,0,1,1,1},
 				{1,0,1,0,1,1,0,1,0,1},
-				{1,0,0,0,0,1,0,0,0,1},
-				{1,0,1,1,0,0,0,1,0,1},
-				{1,0,0,1,1,1,0,1,0,1},
-				{1,0,0,0,0,1,1,1,0,1},
+				{1,0,0,0,4,1,0,0,0,1},
+				{1,0,1,1,0,0,4,1,0,1},
+				{1,4,0,1,1,1,0,1,0,1},
+				{1,0,0,0,4,1,1,1,0,1},
 				{1,1,1,1,2,1,1,1,1,1}
-			},
+			});
+
 			//Layout 3
-			{
+			layouts.add(new int[][] {
 				{1,1,1,1,1,1,1,1,1,1},
-				{1,0,0,0,0,0,0,1,0,1},
+				{1,3,0,0,0,0,0,1,0,1},
 				{1,0,1,1,1,1,0,0,0,1},
 				{1,0,1,0,0,1,1,1,1,1},
-				{1,0,1,0,1,1,0,0,0,1},
-				{1,0,1,0,0,0,0,1,1,1},
-				{1,0,0,0,1,0,1,1,0,1},
-				{1,1,0,1,1,0,0,1,0,1},
+				{1,0,1,0,1,1,0,4,0,1},
+				{1,0,1,0,4,0,0,1,1,1},
+				{1,4,0,0,1,0,1,1,0,1},
+				{1,1,0,1,1,4,0,1,0,1},
 				{2,0,0,0,1,1,0,0,0,1},
 				{1,1,1,1,1,1,1,1,1,1}
-			},
-			//Layout 4
-			{
-				{1,1,1,1,1,1,1,1,1,1},
-				{1,0,0,0,0,0,0,0,0,1},
-				{1,1,1,1,1,0,1,1,0,1},
-				{1,0,1,0,0,0,1,0,0,1},
-				{1,0,1,0,1,1,1,0,1,1},
-				{1,0,0,0,0,0,1,0,0,2},
-				{1,0,1,1,1,0,1,1,1,1},
-				{1,0,1,0,1,0,0,1,0,1},
-				{1,0,0,0,1,1,0,0,0,1},
-				{1,1,1,1,1,1,1,1,1,1}
-			},
-			//Layout 5
-			{
-				{1,1,1,1,1,1,1,1,1,1},
-				{1,0,1,1,1,0,0,1,0,1},
-				{1,0,0,1,1,1,0,1,0,1},
-				{1,1,0,0,0,0,0,1,0,1},
-				{1,1,0,1,1,1,0,1,0,1},
-				{1,0,0,1,0,1,0,0,0,1},
-				{1,0,1,1,0,1,1,1,0,1},
-				{1,0,1,1,0,0,0,0,0,1},
-				{1,0,0,1,1,1,1,1,0,1},
-				{1,1,1,1,1,1,1,1,2,1}
-			}
-		};
-		
-		private int[][] currentLayout;
+			});
 
-		public Maze() {
+			//Layout 4
+			layouts.add(new int[][] {
+				{1,1,1,1,1,1,1,1,1,1},
+				{1,3,0,0,0,0,0,0,0,1},
+				{1,1,1,1,1,0,1,1,0,1},
+				{1,0,1,0,0,0,1,4,0,1},
+				{1,0,1,0,1,1,1,0,1,1},
+				{1,4,0,0,0,0,1,0,0,2},
+				{1,0,1,1,1,0,1,1,1,1},
+				{1,0,1,4,1,0,0,1,0,1},
+				{1,0,0,0,1,1,4,0,0,1},
+				{1,1,1,1,1,1,1,1,1,1}
+			});
+
+			//Layout 5
+			layouts.add(new int[][] {
+				{1,1,1,1,1,1,1,1,1,1},
+				{1,3,1,1,1,0,0,1,0,1},
+				{1,0,0,1,1,1,0,1,0,1},
+				{1,1,0,4,0,0,0,1,0,1},
+				{1,1,0,1,1,1,0,1,0,1},
+				{1,4,0,1,0,1,0,0,0,1},
+				{1,0,1,1,0,1,1,1,0,1},
+				{1,0,1,1,0,4,0,0,0,1},
+				{1,4,0,1,1,1,1,1,0,1},
+				{1,1,1,1,1,1,1,1,2,1}
+			});
+
 			// Use Random to pick one layout from the 3D array
 			Random rand = new Random();
-			int index = rand.nextInt(layouts.length);
-			this.currentLayout = layouts[index];
-			
+			int index = rand.nextInt(layouts.size());
+			this.currentLayout = layouts.get(index);
+
 			try {
 				floorImage = ImageIO.read(getClass().getResource("Pirate_Ship_Deck.png"));
 				cornerImage = ImageIO.read(getClass().getResource("Wood_corner2.png"));
 				sideImage = ImageIO.read(getClass().getResource("Ship_wall1.png"));
-				
-				BufferedImage doorBase = ImageIO.read(getClass().getResource("Plank_water.png"));
-				BufferedImage doorTop = ImageIO.read(getClass().getResource("Plank.png"));
-				exitImage = new BufferedImage(48, 48, BufferedImage.TYPE_INT_ARGB);
-				Graphics2D gExit = exitImage.createGraphics();
-				gExit.drawImage(doorBase, 0, 0, 48, 48, null);
-				gExit.drawImage(doorTop, 0, 0, 48, 48, null);
-				gExit.dispose();
-				
+
+				exitBase = ImageIO.read(getClass().getResource("Plank_water.png"));
+				exitTop = ImageIO.read(getClass().getResource("Plank.png"));
+
 			} catch (IOException | IllegalArgumentException e) {
 				floorImage = null; // Fallback to original color if missing
-				exitImage = null;
+				exitBase = null;
+				exitTop = null;
 			}
 		}
-		
+
 		public boolean isWall(int row, int col) {
 			if (row < 0 || col < 0 || row >= currentLayout.length || col >= currentLayout[0].length) return true;
 			return currentLayout[row][col] == 1;
 		}
-		
+
 		public boolean isExit(int row, int col) {
 			if (row < 0 || col < 0 || row >= currentLayout.length || col >= currentLayout[0].length) return false;
 			return currentLayout[row][col] == 2;
 		}
-		
+
+		public int[] getPlayerSpawn() {
+			for (int r = 0; r < currentLayout.length; r++) {
+				for (int c = 0; c < currentLayout[r].length; c++) {
+					if (currentLayout[r][c] == 3) {
+						return new int[]{r, c};
+					}
+				}
+			}
+			return new int[]{1, 1};
+		}
+
+		public ArrayList<int[]> getZombieSpawns() {
+			ArrayList<int[]> spawns = new ArrayList<>();
+			for (int r = 0; r < currentLayout.length; r++) {
+				for (int c = 0; c < currentLayout[r].length; c++) {
+					if (currentLayout[r][c] == 4) {
+						spawns.add(new int[]{r, c});
+					}
+				}
+			}
+			return spawns;
+		}
+
 		public void draw(Graphics g) {
 			Graphics2D g2d = (Graphics2D) g;
 			int size = currentLayout.length;
 
 			for (int r = 0; r < size; r++) {
 				for (int c = 0; c < size; c++) {
-					int x = c * 48;
-					int y = r * 48;
+					int x = c * TILE_SIZE;
+					int y = r * TILE_SIZE;
 
-					if (floorImage != null) g2d.drawImage(floorImage, x, y, 48, 48, null);
-					
+					if (floorImage != null) g2d.drawImage(floorImage, x, y, TILE_SIZE, TILE_SIZE, null);
+
 					if (isExit(r, c)) {
 						// AUTO-ROTATE EXIT based on which wall it is on
 						double angle = 0;
 						if (c == size - 1) angle = 90;  // Right wall
 						else if (r == size - 1) angle = 180; // Bottom wall
 						else if (c == 0) angle = 270; // Left wall
-						
-						drawRotated(g2d, exitImage, x, y, angle);
-					} 
+
+						drawRotated(g2d, exitBase, x, y, angle);
+						drawRotated(g2d, exitTop, x, y, angle);
+					}
 
 					else if (isWall(r, c)) {
 						// 1. PERMANENT OUTER FRAME LOGIC
-						if (r == 0 && c == 0) drawRotated(g2d, cornerImage, x, y, 0); 
+						if (r == 0 && c == 0) drawRotated(g2d, cornerImage, x, y, 0);
 						else if (r == 0 && c == size - 1) drawRotated(g2d, cornerImage, x, y, 90);
 						else if (r == size - 1 && c == size - 1) drawRotated(g2d, cornerImage, x, y, 180);
 						else if (r == size - 1 && c == 0) drawRotated(g2d, cornerImage, x, y, 270);
@@ -152,7 +181,7 @@ public class Maze {
 						else if (c == size - 1) drawRotated(g2d, sideImage, x, y, 90); // Right wall
 						else if (r == size - 1) drawRotated(g2d, sideImage, x, y, 180); // Bottom wall
 						else if (c == 0) drawRotated(g2d, sideImage, x, y, 270); // Left wall
-						
+
 						// 2. INTERNAL DYNAMIC LOGIC
 						else {
 							drawInternalWall(g2d, r, c, x, y);
@@ -178,16 +207,18 @@ public class Maze {
 			else if (up || down) drawRotated(g2d, sideImage, x, y, 90);
 			else {
 				g2d.setColor(new Color(0, 125, 0));
-				g2d.fillRect(x, y, 48, 48);
+				g2d.fillRect(x, y, TILE_SIZE, TILE_SIZE);
 			}
 		}
 
 		private void drawRotated(Graphics2D g2d, BufferedImage img, int x, int y, double angle) {
 			if (img == null) return;
-			AffineTransform old = g2d.getTransform();
-			g2d.rotate(Math.toRadians(angle), x + 24, y + 24);
-			g2d.drawImage(img, x, y, 48, 48, null);
-			g2d.setTransform(old);
+			double radians = angle * Math.PI / 180.0;
+			int cx = x + TILE_SIZE / 2;
+			int cy = y + TILE_SIZE / 2;
+			g2d.rotate(radians, cx, cy);
+			g2d.drawImage(img, x, y, TILE_SIZE, TILE_SIZE, null);
+			g2d.rotate(-radians, cx, cy);
 		}
 	}
 
@@ -206,15 +237,15 @@ public class Maze {
 //			{1,0,0,0,0,0,0,0,0,1},
 //			{1,0,1,1,1,1,1,1,0,1},
 //			{1,1,1,1,1,1,1,1,1,1},
-//			
+//
 //	};
-//	
+//
 //	public boolean isWall(int row, int col) {
 //		if (row < 0 || col < 0 || row >= layout.length || col >= layout[0].length) return true;
 //			return layout[row][col] == 1;
-//		
+//
 //	}
-	
+
 //	public void draw(Graphics g) {
 //		for (int i = 0; i < layout.length; i++) {
 //			for (int k = 0; k < layout[0].length; k++) {
@@ -227,4 +258,3 @@ public class Maze {
 //			}
 //		}
 //	}
-

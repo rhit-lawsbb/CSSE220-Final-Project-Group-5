@@ -3,17 +3,18 @@ package model;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.image.ImageObserver;
 import java.util.Random;
-
-import javax.swing.Timer;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
+
 // main game class test
-public class GameModel {
+public class GameModel implements ZombieDeathListener {
 	private Maze maze;
 	private Player player;
 	private ArrayList<Zombie> zombies;
@@ -21,15 +22,13 @@ public class GameModel {
 	private Heart heart;
 	private CollisionHandler collisionHandler;
 	private Gun gun;
-	
+
 	private Armor armor;
 	private boolean isGunRespawning = false;
-	
+
 	private boolean gameOver;
-	private boolean playingDeathVideo = false;
-	private boolean playingWinVideo = false;
-	private boolean playingTreasureVideo = false;
 	private boolean gameWon;
+
 	private static final int COINS_PER_LEVEL = 5;
 	private int level = 1;
 	private int zombieDamage = 1;
@@ -40,33 +39,88 @@ public class GameModel {
 	private int heartsSpawnedCount = 0;
 	private static final int MAX_HEARTS = 4;
 
+	private int zombieRespawnCounter = 0;
+	private int zombiesWaiting = 0;
+	private int heartRespawnCounter = 0;
+	private int gunRespawnCounter = 0;
+
+	private Clip backgroundMusic;
+
 	// sets up the maze, player, enemies, and collectibles
 	public GameModel() {
+		level = 1;
+		zombieDamage = 1;
+		coinsRequired = COINS_PER_LEVEL;
+		initLevel(2, 0);
+		playBackgroundMusic();
+	}
+
+	private void playBackgroundMusic() {
+		try {
+			AudioInputStream audioIn = AudioSystem.getAudioInputStream(
+				getClass().getResource("pirate_theme.wav"));
+			backgroundMusic = AudioSystem.getClip();
+			backgroundMusic.open(audioIn);
+			FloatControl volume = (FloatControl) backgroundMusic.getControl(
+				FloatControl.Type.MASTER_GAIN);
+			volume.setValue(-20.0f);
+			backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY);
+		} catch (Exception e) {
+			System.out.println("Music error: " + e.getMessage());
+		}
+	}
+
+	private void initLevel(int zombieCount, int previousScore) {
 		maze = new Maze();
-		player = new Player(1, 1, maze);
-		
+
+		int[] playerSpawn = maze.getPlayerSpawn();
+		player = new Player(playerSpawn[0], playerSpawn[1], maze);
+
 		zombies = new ArrayList<>();
 		items = new ArrayList<>();
 		gameOver = false;
-		gameWon =  false;
+		gameWon = false;
+		isHeartRespawning = false;
+		heartsSpawnedCount = 0;
+		zombieRespawnCounter = 0;
+		zombiesWaiting = 0;
+		heartRespawnCounter = 0;
+		gunRespawnCounter = 0;
 
-		spawnZombies(2);
+		// places zombies from tile legend positions
+		ArrayList<int[]> zombieSpawns = maze.getZombieSpawns();
+		for (int i = 0; i < zombieCount && i < zombieSpawns.size(); i++) {
+			int[] pos = zombieSpawns.get(i);
+			zombies.add(new Zombie(pos[0], pos[1], maze));
+		}
+
 		spawnCoins(8);
 		spawnNewHeart();
 		spawnGun();
 
-		setCollisionHandler(new CollisionHandler(player, zombies, items, zombieDamage));
+		if (level >= 3) {
+			spawnArmor();
+		} else {
+			armor = null;
+		}
+
+		collisionHandler = new CollisionHandler(player, zombies, items, zombieDamage, maze, this);
+		collisionHandler.setGun(gun);
+		collisionHandler.setArmor(armor);
+		collisionHandler.setHeart(heart);
+		collisionHandler.addScore(previousScore);
+	}
+
+	@Override
+	public void onZombieDied() {
+		startZombieRespawn();
 	}
 
 	public void startZombieRespawn() {
-		javax.swing.Timer respawnTimer = new javax.swing.Timer(7000, e -> {
-			if (!gameOver && !gameWon) {
-				spawnSingleZombie();
-			}
-			((javax.swing.Timer)e.getSource()).stop();
-		});
-		respawnTimer.setRepeats(false);
-		respawnTimer.start();
+		zombiesWaiting++;
+		if (zombieRespawnCounter <= 0) {
+			zombieRespawnCounter = 58;
+		}
 	}
 
 	// NEW: Spawns a single zombie at a safe distance
@@ -76,17 +130,10 @@ public class GameModel {
 			int r = rand.nextInt(10);
 			int c = rand.nextInt(10);
 			if (!SpawnHelper.isWall(r, c, maze) &&
-				SpawnHelper.isFarFrom(r, c, Math.round(player.getY()/48), Math.round(player.getX()/48), 3.0)) {
+				SpawnHelper.isFarFrom(r, c, (int)(player.getY()/Maze.TILE_SIZE), (int)(player.getX()/Maze.TILE_SIZE), 3.0)) {
 				zombies.add(new Zombie(r, c, maze));
 				valid = true;
 			}
-		}
-	}
-
-	// places zombies at random valid spots, away from the player
-	private void spawnZombies(int count) {
-		for (int i = 0; i < count; i++) {
-			spawnSingleZombie();
 		}
 	}
 
@@ -138,19 +185,6 @@ public class GameModel {
 		}
 	}
 
-	// picks up heart on contact and starts a timer to spawn the next one
-	private void tryPickUpHeart() {
-		if (heart == null || !heart.isActive() || isHeartRespawning) return;
-		if (!getCollisionHandler().checkHeartCollision(heart)) return;
-
-		isHeartRespawning = true;
-
-		javax.swing.Timer respawnTimer = new javax.swing.Timer(5000, e -> {
-			spawnNewHeart();
-			((javax.swing.Timer)e.getSource()).stop();
-		});
-		respawnTimer.start();
-	}
 	private void spawnGun() {
 		boolean valid = false;
 		int attempts = 0;
@@ -159,7 +193,7 @@ public class GameModel {
 			int r = rand.nextInt(10);
 			int c = rand.nextInt(10);
 			if (!SpawnHelper.isWall(r, c, maze) && !maze.isExit(r, c) &&
-				!SpawnHelper.isEntityAt(r, c, player, zombies) && 
+				!SpawnHelper.isEntityAt(r, c, player, zombies) &&
 				!SpawnHelper.isCoinAt(r, c, items)) {
 				if (gun == null) gun = new Gun(c, r);
 				else gun.respawn(c, r);
@@ -167,7 +201,7 @@ public class GameModel {
 			}
 		}
 	}
-	
+
 	private void spawnArmor() {
 		boolean valid = false;
 		int attempts = 0;
@@ -186,114 +220,95 @@ public class GameModel {
 
 	 private void startGunRespawnTimer() {
 	        isGunRespawning = true;
-	        Timer timer = new Timer(5000, e -> {
-	            boolean valid = false;
-	            while (!valid) {
-	                int r = rand.nextInt(10);
-	                int c = rand.nextInt(10);
-	                if (!SpawnHelper.isWall(r, c, maze) && !SpawnHelper.isExitAt(r, c, maze)) {
-	                    gun.setActive(true);
-	                    // Move gun to new spot or keep original (8,8)
-	                    // gun.setPos(c, r); 
-	                    isGunRespawning = false;
-	                    valid = true;
-	                }
-	            }
-	            ((Timer)e.getSource()).stop();
-	        });
-	        timer.setRepeats(false);
-	        timer.start();
+	        gunRespawnCounter = 42;
 	    }
+
 	 public void levels(){
 		 level++;
 		 if (level > 5) {
-			 playingTreasureVideo = true;
-			 TreasureCutscenePlayer.playVideo(() -> {
-				 playingTreasureVideo = false;
-				 gameWon = true;
-			 });
+			 gameWon = true;
 			 return;
 		 }
 
-		 int prevScore = getCollisionHandler().getScore();
+		 int prevScore = collisionHandler.getScore();
 
 		 int zombieCount;
-		 switch (level) {
-			 case 2: zombieCount = 3; zombieDamage = 1; break;
-			 case 3: zombieCount = 3; zombieDamage = 2; break;
-			 case 4: zombieCount = 4; zombieDamage = 1; break;
-			 case 5: zombieCount = 4; zombieDamage = 2; break;
-			 default: zombieCount = 2; zombieDamage = 1; break;
-		 }
+		 if (level == 2) { zombieCount = 3; zombieDamage = 1; }
+		 else if (level == 3) { zombieCount = 3; zombieDamage = 2; }
+		 else if (level == 4) { zombieCount = 4; zombieDamage = 1; }
+		 else if (level == 5) { zombieCount = 4; zombieDamage = 2; }
+		 else { zombieCount = 2; zombieDamage = 1; }
 
 		 coinsRequired = prevScore + COINS_PER_LEVEL;
-
-		 maze = new Maze();
-		 player = new Player(1, 1, maze);
-		 zombies = new ArrayList<>();
-		 items = new ArrayList<>();
-		 gameOver = false;
-		 playingDeathVideo = false;
-		 playingWinVideo = false;
-		 isHeartRespawning = false;
-		 heartsSpawnedCount = 0;
-
-		 spawnZombies(zombieCount);
-		 spawnCoins(8);
-		 spawnNewHeart();
-		 spawnGun();
-
-		 if (level >= 3) {
-			 spawnArmor();
-		 } else {
-			 armor = null;
-		 }
-
-		 CollisionHandler newHandler = new CollisionHandler(player, zombies, items, zombieDamage);
-		 newHandler.addScore(prevScore);
-		 setCollisionHandler(newHandler);
+		 initLevel(zombieCount, prevScore);
 	 }
 
 	// moves entities, checks collisions, checks game over bo
 	public void update() {
-		if (gameOver || gameWon || playingDeathVideo || playingWinVideo || playingTreasureVideo) return;
+		if (gameOver || gameWon) return;
 
 		player.update();
-		
-		if (gun != null && gun.isActive() && gun.collidesWith(player)) {
-		    player.pickupGun();
-		    gun.setActive(false);
-		}
-		if (armor != null && armor.isActive() &&
-			Math.abs(player.getX() - armor.getX()) < 36 &&
-			Math.abs(player.getY() - armor.getY()) < 36) {
-			armor.setActive(false);
-			getCollisionHandler().setDamage(Math.max(1, zombieDamage / 2));
-		}
-		player.updateBullets(zombies, items, this);
+		player.updateBullets();
 		for (Zombie z : zombies) {
 			z.wander();
 		}
-		
-		int pr = Math.round(player.getY()/48);
-		int pc = Math.round(player.getX()/48);
-		if (maze.isExit(pr, pc) && getCollisionHandler().getScore() >= getCoinsRequired() && !playingWinVideo) {
-			playingWinVideo = true;
-			WinVideoPlayer.playVideo(() -> {
-				playingWinVideo = false;
-				levels();
-			});
+
+		collisionHandler.checkCollisions();
+
+		if (zombieRespawnCounter > 0) {
+			zombieRespawnCounter--;
+			if (zombieRespawnCounter == 0 && zombiesWaiting > 0) {
+				if (!gameOver && !gameWon) {
+					spawnSingleZombie();
+				}
+				zombiesWaiting--;
+				if (zombiesWaiting > 0) {
+					zombieRespawnCounter = 58;
+				}
+			}
 		}
 
-		getCollisionHandler().checkCollisions();
-		tryPickUpHeart();
+		// picks up heart on contact and starts a timer to spawn the next one
+		if (heart != null && !heart.isActive() && !isHeartRespawning) {
+			isHeartRespawning = true;
+			heartRespawnCounter = 42;
+		}
+		if (heartRespawnCounter > 0) {
+			heartRespawnCounter--;
+			if (heartRespawnCounter == 0) {
+				spawnNewHeart();
+				if (heart != null) {
+					collisionHandler.setHeart(heart);
+				}
+			}
+		}
+
+		if (gunRespawnCounter > 0) {
+			gunRespawnCounter--;
+			if (gunRespawnCounter == 0) {
+				boolean valid = false;
+				while (!valid) {
+					int r = rand.nextInt(10);
+					int c = rand.nextInt(10);
+					if (!SpawnHelper.isWall(r, c, maze) && !SpawnHelper.isExitAt(r, c, maze)) {
+						gun.setActive(true);
+						// Move gun to new spot or keep original (8,8)
+						// gun.setPos(c, r);
+						isGunRespawning = false;
+						valid = true;
+					}
+				}
+			}
+		}
+
+		int pr = (int)(player.getY()/Maze.TILE_SIZE);
+		int pc = (int)(player.getX()/Maze.TILE_SIZE);
+		if (maze.isExit(pr, pc) && collisionHandler.getScore() >= getCoinsRequired()) {
+			levels();
+		}
 
 		if (!player.isAlive()) {
-			playingDeathVideo = true;
-			DeathVideoPlayer.playVideo(() -> {
-				playingDeathVideo = false;
-				gameOver = true;
-			});
+			gameOver = true;
 		}
 	}
 
@@ -311,7 +326,6 @@ public class GameModel {
 
 		player.handleKey(e);
 	}
-	
 
 
 	// resets everything back to a fresh game
@@ -319,64 +333,15 @@ public class GameModel {
 		level = 1;
 		zombieDamage = 1;
 		coinsRequired = COINS_PER_LEVEL;
-
-		maze = new Maze();
-		player = new Player(1, 1, maze);
-		zombies = new ArrayList<>();
-		items = new ArrayList<>();
-		gameOver = false;
-		playingDeathVideo = false;
-		playingWinVideo = false;
-		playingTreasureVideo = false;
-		gameWon = false;
-		isHeartRespawning = false;
-		heartsSpawnedCount = 0;
-		armor = null;
-
-		spawnZombies(2);
-		spawnCoins(8);
-		spawnNewHeart();
-		spawnGun();
-
-		setCollisionHandler(new CollisionHandler(player, zombies, items, zombieDamage));
+		initLevel(2, 0);
 	}
 
 	// draws everything, plus a game over screen if the player died
-	public void draw(Graphics g, ImageObserver observer) {
-		if (playingDeathVideo) {
-			g.setColor(Color.BLACK);
-			g.fillRect(0, 0, 480, 480);
-			Image frame = DeathVideoPlayer.getVideoImage();
-			if (frame != null) {
-				g.drawImage(frame, 0, 0, 480, 480, observer);
-			}
-			return;
-		}
-
-		if (playingWinVideo) {
-			g.setColor(Color.BLACK);
-			g.fillRect(0, 0, 480, 480);
-			Image frame = WinVideoPlayer.getVideoImage();
-			if (frame != null) {
-				g.drawImage(frame, 0, 0, 480, 480, observer);
-			}
-			return;
-		}
-
-		if (playingTreasureVideo) {
-			g.setColor(Color.BLACK);
-			g.fillRect(0, 0, 480, 480);
-			Image frame = TreasureCutscenePlayer.getVideoImage();
-			if (frame != null) {
-				g.drawImage(frame, 0, 0, 480, 480, observer);
-			}
-			return;
-		}
-
+	public void draw(Graphics g) {
 		maze.draw(g);
 		for (Collectables item : items) { item.draw(g); }
 		if (heart != null && heart.isActive()) { heart.draw(g); }
-		if (gun.isActive()) { gun.draw(g); }
+		if (gun != null && gun.isActive()) { gun.draw(g); }
 		if (armor != null && armor.isActive()) { armor.draw(g); }
 		player.draw(g);
 		for (Zombie z : zombies) { z.draw(g); }
@@ -387,31 +352,27 @@ public class GameModel {
 			drawEndScreen(g, "GAME OVER", Color.RED);
 		}
 	}
-	
+
 	private void drawEndScreen(Graphics g, String msg, Color color) {
 		g.setColor(new Color(0, 0, 0, 150));
-		g.fillRect(0, 0, 480, 480);
+		g.fillRect(0, 0, Maze.TILE_SIZE * 10, Maze.TILE_SIZE * 10);
 		g.setColor(color);
 		g.setFont(new Font("Arial", Font.BOLD, 48));
-		g.drawString(msg, msg.contains("WIN") ? 100 : 95, 240);
+		g.drawString(msg, msg.equals("YOU WIN!") ? 100 : 95, 240);
 		g.setColor(Color.WHITE);
 		g.setFont(new Font("Arial", Font.PLAIN, 20));
-		g.drawString("Score: " + getCollisionHandler().getScore(), 185, 280);
+		g.drawString("Score: " + collisionHandler.getScore(), 185, 280);
 		g.drawString("Press R to Restart", 165, 320);
 	}
 
-	public int getScore() { return getCollisionHandler().getScore(); }
+	public int getScore() { return collisionHandler.getScore(); }
 
 	public int getLives() { return player.getLives(); }
-	
+
 	public Player getPlayer() { return player; }
 
 	public CollisionHandler getCollisionHandler() {
 		return collisionHandler;
-	}
-
-	public void setCollisionHandler(CollisionHandler collisionHandler) {
-		this.collisionHandler = collisionHandler;
 	}
 
 	public int getCoinsRequired() {
@@ -423,8 +384,4 @@ public class GameModel {
 	}
 
 	public boolean isGameOver() { return gameOver; }
-
-	public boolean isPlayingDeathVideo() { return playingDeathVideo; }
-
-	public boolean isPlayingWinVideo() { return playingWinVideo; }
 }

@@ -6,46 +6,46 @@ public class SpawnHelper {
 	public static boolean isWall(int r, int c, Maze maze) {
 		return maze.isWall(r, c);
 	}
-	
+
 	public static boolean isExitAt(int r, int c, Maze maze) {
 		return maze.isExit(r, c);
 	}
-	
+
 	public static boolean isGunAt(int r, int c, Gun gun) {
 		if (gun != null && gun.isActive()) {
-			return Math.round(gun.getY() / 48) == r && Math.round(gun.getX() / 48) == c;
+			return (int)(gun.getY() / Maze.TILE_SIZE) == r && (int)(gun.getX() / Maze.TILE_SIZE) == c;
 		}
 		return false;
 	}
-	
+
 	public static boolean isFarFrom(int r, int c, int targetR, int targetC, double minDist) {
-		double dist = Math.sqrt(Math.pow(r - targetR, 2) + Math.pow(c - targetC, 2));
-		return dist >= minDist;
+		double distSquared = (r - targetR) * (r - targetR) + (c - targetC) * (c - targetC);
+		return distSquared >= minDist * minDist;
 	}
-	
+
 	public static boolean isFarFromOtherZombies(int r, int c, ArrayList<Zombie> zombies, double minDist) {
 		for (Zombie z : zombies) {
-			int zRow = Math.round(z.y / 48);
-			int zCol = Math.round(z.x / 48);
-			double dist = Math.sqrt(Math.pow(zRow - r, 2) + Math.pow(zCol - c, 2));
-			if (dist < minDist) return false;
+			int zRow = (int)(z.getY() / Maze.TILE_SIZE);
+			int zCol = (int)(z.getX() / Maze.TILE_SIZE);
+			double distSquared = (zRow - r) * (zRow - r) + (zCol - c) * (zCol - c);
+			if (distSquared < minDist * minDist) return false;
 		}
 		return true;
 	}
-	
+
 	public static boolean isEntityAt(int r, int c, Player p, ArrayList<Zombie> zombies) {
-		if (p != null && Math.round(p.y / 48) == r && Math.round(p.x / 48) == c) return true;
+		if (p != null && (int)(p.getY() / Maze.TILE_SIZE) == r && (int)(p.getX() / Maze.TILE_SIZE) == c) return true;
 		if (zombies != null) {
 			for (Zombie z : zombies) {
-				if (Math.round(z.y / 48) == r && Math.round(z.x / 48) == c) return true;
+				if ((int)(z.getY() / Maze.TILE_SIZE) == r && (int)(z.getX() / Maze.TILE_SIZE) == c) return true;
 			}
 		}
 		return false;
 	}
-	
+
 	public static boolean isCoinAt(int r, int c, ArrayList<Collectables> items) {
 		for (Collectables item : items) {
-			if (Math.round(item.getY() / 48) == r && Math.round(item.getX() / 48) == c) return true;
+			if ((int)(item.getY() / Maze.TILE_SIZE) == r && (int)(item.getX() / Maze.TILE_SIZE) == c) return true;
 		}
 		return false;
 	}
