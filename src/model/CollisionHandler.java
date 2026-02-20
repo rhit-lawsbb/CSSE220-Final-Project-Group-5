@@ -11,11 +11,15 @@ import javax.sound.sampled.FloatControl;
 /**
  * Class: CollisionHandler 
  * @author Group 5
- * <br>Purpose:
- * <br>Restrictions:
+ * <br>Purpose: Manages all collisions between player, zombie, pickup, bullets, and processes them
+ * in charge of updating score, life count, damage done
+ * keeps track of pickups and removing zombies
+ * <br>Restrictions: Only in charge of collisions, doesnt have control of movement or rendering
+ * Needs to be called every frame to detect new collisions
  * <br>For Example:
  * <pre>
- * 		
+ * 		CollisionHandler handler = new CollisionHandler(player, zombies, items, damage, maze, listener);
+ * 		handler.checkCollisions();
  * </pre>
  */
 
@@ -37,6 +41,17 @@ public class CollisionHandler {
 	private Clip armorSound;
 	private Clip gunPickupSound;
 
+	/**
+	 * ensures: starts the collision tracking for player, zombies, pickups, collectables
+	 * starts playing sound effects and sets starting score
+	 * @param player player in game who collides with other things
+	 * @param zombies list of zombies in the game at once
+	 * @param items list of collectable items
+	 * @param damage amount of damage delt by zombies
+	 * @param maze the maze of the level, needed for the tiles
+	 * @param listener listener which is needed for when zombies die
+	 * <br>requires: player &ne; null, zombies &ne; null, items &ne; null, maze &ne; null
+	 */
 	public CollisionHandler(Player player, ArrayList<Zombie> zombies, ArrayList<Collectables> items,
 							int damage, Maze maze, ZombieDeathListener listener) {
 		this.player = player;
@@ -73,7 +88,10 @@ public class CollisionHandler {
 		clip.start();
 	}
 
-	// runs all collision checks each frame
+	/**
+	 * ensures: checks all types of collision and processes them all
+	 * this includes zombie, gun, armor, heart, coins and bullet
+	 */
 	public void checkCollisions() {
 		checkCoinCollisions();
 		checkZombieCollisions();
@@ -83,7 +101,7 @@ public class CollisionHandler {
 		checkBulletCollisions();
 	}
 
-	// checks if two objects are close enough to be touching
+	
 	private boolean overlaps(double x1, double y1, double x2, double y2, int threshold) {
 		double diffX = x1 - x2;
 		double diffY = y1 - y2;
@@ -173,11 +191,39 @@ public class CollisionHandler {
 		}
 	}
 
+	/**
+	 * ensures: sets reference point of the gun used for collision checking
+	 * @param gun the gun to track
+	 */
 	public void setGun(Gun gun) { this.gun = gun; }
+	
+	/**
+	 * ensures: sets reference point of the armor used for collision checking
+	 * @param armor the armor to track
+	 */
 	public void setArmor(Armor armor) { this.armor = armor; }
+	
+	/**
+	 * ensures: sets reference point of the heart used for collision checking
+	 * @param heart the heart to track
+	 */
 	public void setHeart(Heart heart) { this.heart = heart; }
 
+	/**
+	 * ensures: returns the score value of the player
+	 * @return player's score
+	 */
 	public int getScore() { return score; }
+	
+	/**
+	 * ensures: increase the score value by a certain amount
+	 * @param points number of points to increase the score by
+	 */
 	public void addScore(int points) { score += points; }
+	
+	/**
+	 * ensures: sets the damage amount by the zombies to a certain value
+	 * @param damage damage value it is set to
+	 */
 	public void setDamage(int damage) { this.damage = damage; }
 }

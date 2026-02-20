@@ -8,11 +8,13 @@ import javax.imageio.ImageIO;
 /**
  * Class: Collectables 
  * @author Group 5
- * <br>Purpose:
- * <br>Restrictions:
+ * <br>Purpose: represent a coin pickup which increases the players score
+ * handles sprite and its flipping
+ * <br>Restrictions: Cant modify the score or collision logic, as that is done by CollisionHandler
+ * This class only deals with visuals and position.
  * <br>For Example:
  * <pre>
- * 		
+ * 		Collectables coin = new Collectables(2, 3);
  * </pre>
  */
 
@@ -23,6 +25,13 @@ public class Collectables extends Pickup {
 	private static final String TAILS_IMAGE = "Gold_Collectable_flipped.png";
 	private int frameCount = 0; // Flips every 0.5 seconds
 
+	/**
+	 * ensures: creates a coin at a specified location on the map based off col and row
+	 * attempts to load the flipped and unflipped sprites of the coin at location
+	 * if sprite fails to load, then sprite is set to null.
+	 * @param col column location of collectable on map
+	 * @param row row location of collectable on map
+	 */
 	public Collectables(int col, int row) {
 		super(col, row);
 		try {
@@ -37,6 +46,13 @@ public class Collectables extends Pickup {
 		}
 	}
 
+	/**
+	 * ensures: draws coin on screen at specified tile location
+     * alternates between two sprites, those being an unflipped and flipped version of the coin
+     * if sprites are null, nothing gets drawn
+     * @param g graphics used for rendering
+     * <br>requires: g &ne; null
+	 */
 	@Override
 	public void draw(Graphics g) {
 		if (getSprite() == null || spriteTails == null) return;
