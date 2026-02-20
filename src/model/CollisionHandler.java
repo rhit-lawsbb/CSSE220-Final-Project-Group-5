@@ -8,7 +8,17 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 
-// handles all collision detection between the player and other objects
+/**
+ * Class: CollisionHandler 
+ * @author Group 5
+ * <br>Purpose:
+ * <br>Restrictions:
+ * <br>For Example:
+ * <pre>
+ * 		
+ * </pre>
+ */
+
 public class CollisionHandler {
 	private Player player;
 	private ArrayList<Zombie> zombies;

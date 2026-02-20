@@ -13,7 +13,17 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 
-// main game class test
+/**
+ * Class: GameModel 
+ * @author Group 5
+ * <br>Purpose:
+ * <br>Restrictions:
+ * <br>For Example:
+ * <pre>
+ * 		
+ * </pre>
+ */
+
 public class GameModel implements ZombieDeathListener {
 	private Maze maze;
 	private Player player;

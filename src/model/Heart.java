@@ -5,6 +5,17 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
+/**
+ * Class: Heart 
+ * @author Group 5
+ * <br>Purpose:
+ * <br>Restrictions:
+ * <br>For Example:
+ * <pre>
+ * 		
+ * </pre>
+ */
+
 public class Heart extends Pickup {
 	private BufferedImage sprite2;
 	private int frameCount = 0;

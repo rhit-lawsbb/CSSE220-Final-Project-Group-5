@@ -5,6 +5,17 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
+/**
+ * Class: Gun 
+ * @author Group 5
+ * <br>Purpose:
+ * <br>Restrictions:
+ * <br>For Example:
+ * <pre>
+ * 		
+ * </pre>
+ */
+
 public class Gun extends Pickup {
 
     public Gun(int col, int row) {

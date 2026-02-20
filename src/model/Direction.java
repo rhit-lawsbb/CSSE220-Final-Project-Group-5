@@ -1,5 +1,16 @@
 package model;
-// Defines dx and dy and the rate they move
+
+/**
+ * Class: Direction 
+ * @author Group 5
+ * <br>Purpose:
+ * <br>Restrictions:
+ * <br>For Example:
+ * <pre>
+ * 		
+ * </pre>
+ */
+
 public enum Direction {
 	UP, DOWN, LEFT, RIGHT;
 

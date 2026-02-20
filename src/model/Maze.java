@@ -9,6 +9,17 @@ import java.util.ArrayList;
 import java.util.Random;
 import javax.imageio.ImageIO;
 
+/**
+ * Class: Maze 
+ * @author Group 5
+ * <br>Purpose:
+ * <br>Restrictions:
+ * <br>For Example:
+ * <pre>
+ * 		
+ * </pre>
+ */
+
 public class Maze {
 	 public static final int TILE_SIZE = 48;
 

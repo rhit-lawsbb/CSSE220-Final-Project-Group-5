@@ -4,6 +4,17 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
+/**
+ * Class: Entity 
+ * @author Group 5
+ * <br>Purpose:
+ * <br>Restrictions:
+ * <br>For Example:
+ * <pre>
+ * 		
+ * </pre>
+ */
+
 public abstract class Entity {
 	 private double x, y;
 	 private Maze maze;
