@@ -16,11 +16,13 @@ import javax.sound.sampled.FloatControl;
 /**
  * Class: GameModel 
  * @author Group 5
- * <br>Purpose:
- * <br>Restrictions:
- * <br>For Example:
+ * <br>Purpose: controls game state, levels, collision, entity spawn, score, sound effect, win and lose
+ * <br>Restrictions: doesnt control movement of entity
+ * <br>For Example: 
  * <pre>
- * 		
+ * 		GameModel model = new GameModel();
+ * 		model.update();
+ * 		model.draw(g);
  * </pre>
  */
 
@@ -58,7 +60,9 @@ public class GameModel implements ZombieDeathListener {
 	private Clip levelCompleteSound;
 	private Clip gunShootSound;
 
-	// sets up the maze, player, enemies, and collectibles
+	/**
+	 * ensures: sets up the maze, player, enemies, and collectibles
+	 */
 	public GameModel() {
 		level = 1;
 		zombieDamage = 1;
@@ -144,11 +148,17 @@ public class GameModel implements ZombieDeathListener {
 		collisionHandler.addScore(previousScore);
 	}
 
+	/**
+	 * ensures: starts respawn of zombie once one dies
+	 */
 	@Override
 	public void onZombieDied() {
 		startZombieRespawn();
 	}
 
+	/**
+	 * ensures: increases zombies waiting and starts respawn timer
+	 */
 	public void startZombieRespawn() {
 		zombiesWaiting++;
 		if (zombieRespawnCounter <= 0) {
@@ -156,7 +166,7 @@ public class GameModel implements ZombieDeathListener {
 		}
 	}
 
-	// NEW: Spawns a single zombie at a safe distance
+	
 	private void spawnSingleZombie() {
 		boolean valid = false;
 		while (!valid) {
@@ -170,7 +180,7 @@ public class GameModel implements ZombieDeathListener {
 		}
 	}
 
-	// places coins at random empty spots
+	
 	private void spawnCoins(int count) {
 		for (int i = 0; i < count; i++) {
 			boolean valid = false;
@@ -192,7 +202,7 @@ public class GameModel implements ZombieDeathListener {
 		}
 	}
 
-	// spawns a heart pickup, stops after max limit is reached
+	
 	private void spawnNewHeart() {
 		if (heartsSpawnedCount >= MAX_HEARTS) {
 			heart = null;
@@ -256,6 +266,9 @@ public class GameModel implements ZombieDeathListener {
 	        gunRespawnCounter = 42;
 	    }
 
+	 /**
+	  * ensures: advances game to next level or sets game to win
+	  */
 	 public void levels(){
 		 level++;
 		 if (level > 5) {
@@ -276,7 +289,9 @@ public class GameModel implements ZombieDeathListener {
 		 initLevel(zombieCount, prevScore);
 	 }
 
-	// moves entities, checks collisions, checks game over bo
+	/**
+	 * ensures: moves entities, checks collisions, checks game over
+	 */
 	public void update() {
 		if (gameOver || gameWon) return;
 
@@ -301,7 +316,7 @@ public class GameModel implements ZombieDeathListener {
 			}
 		}
 
-		// picks up heart on contact and starts a timer to spawn the next one
+		// respawn timer
 		if (heart != null && !heart.isActive() && !isHeartRespawning) {
 			isHeartRespawning = true;
 			heartRespawnCounter = 42;
@@ -346,7 +361,10 @@ public class GameModel implements ZombieDeathListener {
 		}
 	}
 
-	// passes key input to player
+	/**
+	 * ensures: passes key input to player
+	 * @param e event triggered by user
+	 */
 	public void handleKey(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_F) {
 		    if (player.hasGun()) playSound(gunShootSound);
@@ -363,7 +381,7 @@ public class GameModel implements ZombieDeathListener {
 	}
 
 
-	// resets everything back to a fresh game
+	
 	private void restart() {
 		level = 1;
 		zombieDamage = 1;
@@ -371,7 +389,10 @@ public class GameModel implements ZombieDeathListener {
 		initLevel(2, 0);
 	}
 
-	// draws everything, plus a game over screen if the player died
+	/**
+	 * draws everything, plus a game over screen if the player died
+	 * @param g graphics component
+	 */
 	public void draw(Graphics g) {
 		maze.draw(g);
 		for (Collectables item : items) { item.draw(g); }
@@ -388,6 +409,7 @@ public class GameModel implements ZombieDeathListener {
 		}
 	}
 
+	
 	private void drawEndScreen(Graphics g, String msg, Color color) {
 		g.setColor(new Color(0, 0, 0, 150));
 		g.fillRect(0, 0, Maze.TILE_SIZE * 10, Maze.TILE_SIZE * 10);

@@ -12,11 +12,12 @@ import javax.imageio.ImageIO;
 /**
  * Class: Maze 
  * @author Group 5
- * <br>Purpose:
- * <br>Restrictions:
+ * <br>Purpose: stores maze layout, draws tiles
+ * <br>Restrictions: fixed layout of 10x10
  * <br>For Example:
  * <pre>
- * 		
+ * 		Maze maze = new Maze();
+ * 		maze.draw(g);
  * </pre>
  */
 
@@ -33,7 +34,9 @@ public class Maze {
 	 // 0=floor, 1=wall, 2=exit, 3=player spawn, 4=zombie spawn
 	 private ArrayList<int[][]> layouts;
 	 private int[][] currentLayout;
-
+	 	/**
+	 	 * ensures: creates maze using layout and images of tiles
+	 	 */
 		public Maze() {
 			layouts = new ArrayList<>();
 
@@ -127,16 +130,32 @@ public class Maze {
 			}
 		}
 
+		/**
+		 * ensures: true if tile is wall or bounds
+		 * @param row tile row
+		 * @param col tile column
+		 * @return true if wall
+		 */
 		public boolean isWall(int row, int col) {
 			if (row < 0 || col < 0 || row >= currentLayout.length || col >= currentLayout[0].length) return true;
 			return currentLayout[row][col] == 1;
 		}
 
+		/**
+		 * ensures: true if tile is exit
+		 * @param row tile row
+		 * @param col tile column
+		 * @return true if exit
+		 */
 		public boolean isExit(int row, int col) {
 			if (row < 0 || col < 0 || row >= currentLayout.length || col >= currentLayout[0].length) return false;
 			return currentLayout[row][col] == 2;
 		}
 
+		/**
+		 * ensures: returns spawn tile of player
+		 * @return player spawn {row,col}
+		 */
 		public int[] getPlayerSpawn() {
 			for (int r = 0; r < currentLayout.length; r++) {
 				for (int c = 0; c < currentLayout[r].length; c++) {
@@ -148,6 +167,10 @@ public class Maze {
 			return new int[]{1, 1};
 		}
 
+		/**
+		 * ensures: returns spawn tiles of zombies
+		 * @return list zombie spawn {row,col}
+		 */
 		public ArrayList<int[]> getZombieSpawns() {
 			ArrayList<int[]> spawns = new ArrayList<>();
 			for (int r = 0; r < currentLayout.length; r++) {
@@ -160,6 +183,10 @@ public class Maze {
 			return spawns;
 		}
 
+		/**
+		 * ensures: draws maze and tiles
+		 * @param g graphics component
+		 */
 		public void draw(Graphics g) {
 			Graphics2D g2d = (Graphics2D) g;
 			int size = currentLayout.length;

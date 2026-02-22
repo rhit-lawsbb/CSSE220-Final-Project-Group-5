@@ -8,11 +8,11 @@ import javax.imageio.ImageIO;
 /**
  * Class: Heart 
  * @author Group 5
- * <br>Purpose:
- * <br>Restrictions:
+ * <br>Purpose: represents heart pickup which increases health
+ * <br>Restrictions: only visible when active
  * <br>For Example:
  * <pre>
- * 		
+ * 		Heart heart = new Heart(1,2);
  * </pre>
  */
 
@@ -20,6 +20,11 @@ public class Heart extends Pickup {
 	private BufferedImage sprite2;
 	private int frameCount = 0;
 
+	/**
+	 * ensures: creates heart at location
+	 * @param col column location of heart spawn on map
+	 * @param row row location of heart spawn on map
+	 */
 	public Heart(int col, int row) {
 		super(col, row);
 
@@ -34,6 +39,10 @@ public class Heart extends Pickup {
 		}
 	}
 
+	/**
+	 * ensures: draws heart if active
+	 * @param g graphics component
+	 */
 	@Override
 	public void draw(Graphics g) {
 		 if (!isActive() || getSprite() == null || sprite2 == null) return;
