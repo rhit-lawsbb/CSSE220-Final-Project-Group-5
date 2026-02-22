@@ -2,6 +2,17 @@ package model;
 
 import java.util.ArrayList;
 
+/**
+ * Class: SpawnHelper 
+ * @author Group 5
+ * <br>Purpose: helper methods to help spawning validaiton
+ * <br>Restrictions: only static methods
+ * <br>For Example:
+ * <pre>
+ * 		boolean valid = SpawnHelper.isWall(r,c,maze);
+ * </pre>
+ */
+
 public class SpawnHelper {
 	public static boolean isWall(int r, int c, Maze maze) {
 		return maze.isWall(r, c);

@@ -8,6 +8,17 @@ import java.io.IOException;
 import java.util.List;
 import javax.imageio.ImageIO;
 
+/**
+ * Class: Player 
+ * @author Group 5
+ * <br>Purpose: represents player, handles movement shooting and lives
+ * <br>Restrictions: movement is limited based on walls
+ * <br>For Example:
+ * <pre>
+ * 		Player p = new Player(row, col, maze);
+ * </pre>
+ */
+
 public class Player extends Entity {
 	private Direction direction = Direction.RIGHT;
 	private int lives;
@@ -18,6 +29,12 @@ public class Player extends Entity {
 	private static final int MAX_AMMO = 8;
 	private List<Bullet> bullets = new java.util.ArrayList<>();
 
+	/**
+	 * ensures: creates player at location
+	 * @param row row tile location
+	 * @param col col tile location
+	 * @param maze maze
+	 */
 	public Player(int row, int col, Maze maze) {
 		super(row, col, maze);
 		lives = 3;
@@ -37,6 +54,10 @@ public class Player extends Entity {
 		updateSprite();
 	}
 
+	/**
+	 * ensures: updates player move direction, uses key input
+	 * @param e key event from user input
+	 */
 	public void handleKey(KeyEvent e) {
 		int key = e.getKeyCode();
 		if (key == KeyEvent.VK_W || key == KeyEvent.VK_UP) {
@@ -52,6 +73,9 @@ public class Player extends Entity {
 		}
 	}
 
+	/**
+	 * ensures: moves player in direction if valid
+	 */
 	public void update() {
 		double nextX = getX() + direction.getDx() * STEP;
 		double nextY = getY() + direction.getDy() * STEP;
@@ -61,11 +85,17 @@ public class Player extends Entity {
 		}
 	}
 
+	/**
+	 * ensures: gives player gun, refills amo
+	 */
 	public void pickupGun() {
 		hasGun = true;
 		ammo = MAX_AMMO;
 	}
 
+	/**
+	 * ensires: shoots bullet if valid ammo ammount
+	 */
 	public void shoot() {
 		if (!hasGun || ammo <= 0) return;
 		bullets.add(new Bullet(getX(), getY(), isFacingRight(), getMaze()));
@@ -73,6 +103,9 @@ public class Player extends Entity {
 		if (ammo <= 0) hasGun = false;
 	}
 
+	/**
+	 * ensures: removes inactive bullets and updates the bullets
+	 */
 	public void updateBullets() {
 		for (int i = 0; i < bullets.size(); i++) {
 			Bullet b = bullets.get(i);

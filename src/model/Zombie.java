@@ -8,10 +8,28 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 
+/**
+ * Class: Zombie 
+ * @author Group 5
+ * <br>Purpose: represents zombie enemy
+ * <br>Restrictions: movement is limited based on walls
+ * <br>For Example:
+ * <pre>
+ * 		Zombie z = new Zombie(row, col, maze);
+ * 		z.wander();
+ * </pre>
+ */
+
 public class Zombie extends Entity{
 	private Random rand;
 	private Direction direction;
 
+	/**
+	 * ensures: creates zombie at location, starts the movement of the zombie
+	 * @param row row spawn location
+	 * @param col col spawn location
+	 * @param maze maze
+	 */
 	public Zombie(int row, int col, Maze maze) {
 		super(row, col, maze);
 		rand = new Random();
@@ -38,7 +56,9 @@ public class Zombie extends Entity{
 		else if (dir == Direction.RIGHT) setFacingRight(true);
 	}
 
-	//checks for walls and decides to move Zombie
+	/**
+	 * ensures: checks for walls and decides to move Zombie
+	 */
 	public void wander() {
 		 if ((int) getX() % Maze.TILE_SIZE == 0 && (int) getY() % Maze.TILE_SIZE == 0) {
 

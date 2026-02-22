@@ -9,10 +9,26 @@ import javax.imageio.ImageIO;
 import model.GameModel;
 import model.Maze;
 
+/**
+ * Class: HUD 
+ * @author Group 5
+ * <br>Purpose: shows game information
+ * <br>Restrictions: depends on GameModel for game values
+ * <br>For Example:
+ * <pre>
+ * 		HUD hud = new HUD(model);
+ * 		hud.draw(g);
+ * </pre>
+ */
+
 public class HUD {
     private GameModel model;
     private BufferedImage heartSprite;
 
+    /**
+     * ensures: creates hud and loads hearts
+     * @param model game model
+     */
     public HUD(GameModel model) {
         this.model = model;
         try {
@@ -22,6 +38,10 @@ public class HUD {
         }
     }
 
+    /**
+     * ensures: draws hud
+     * @param g graphics component
+     */
     public void draw(Graphics g) {
         g.setColor(new Color(0, 0, 0, 150));
         g.fillRect(0, 0, Maze.TILE_SIZE * 10, 50);
